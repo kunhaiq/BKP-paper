@@ -200,7 +200,7 @@ Xnew <- lhs(n = 10, rect = Xbounds)
 predict(BKP_model_2D, Xnew)
 
 
-# ============================================================
+# ============================================================ #
 # Execution mode:
 # run_elapsed_time = FALSE means using the pre-computed average
 # elapsed time matrix, without re-running the time measurement
@@ -213,7 +213,7 @@ predict(BKP_model_2D, Xnew)
 #
 # It is recommended to keep this FALSE unless you need to
 # fully reproduce the timing experiments.
-# ============================================================
+# ============================================================ #
 
 run_elapsed_time = FALSE                # Flag to control whether to run timing experiments
 n_vals <- c(200, 500, 1000, 2000, 5000) # Different sample sizes to benchmark
@@ -273,7 +273,7 @@ if(run_elapsed_time){
     }
   }
 
-  # ---- Compute average time for each n ----
+  # ---- Compute average time for each n ---- #
   avg_time <- matrix(NA, nrow = 5, ncol = 5)
   colnames(avg_time) <- paste0("n=", n_vals)
   rownames(avg_time) <- c("given", "single_start", "multi_start", "given_gp", "optim_gp")
@@ -349,7 +349,6 @@ legend("topleft", bty = "n",
 par(mfrow = c(1,1))
 dev.off()
 
-#-------------------------- Classification ------------------------
 #-------------------------- Example 4 ----------------------------
 set.seed(123)
 # Data points
@@ -413,11 +412,10 @@ pdf("ex4LGP.pdf", width = 13, height = 6)
 gridExtra::grid.arrange(p1, p2, ncol = 2)
 dev.off()
 
-#-----------------------------------------------------------------
+
 # ============================================================== #
 # ========================= DKP Examples ======================= #
 # ============================================================== #
-#-------------------------- 1D Example ---------------------------
 #-------------------------- Example 5 ----------------------------
 set.seed(123)
 # Define true class probability function (3-class)
@@ -455,7 +453,6 @@ legend("topright",
        col = c("black", "red", "blue"), lty = 1, lwd = 2)
 dev.off()
 
-#-------------------------- 2D Example ---------------------------
 #-------------------------- Example 6 ----------------------------
 set.seed(123)
 # Define 2D latent function and probability transformation (3-class)
@@ -513,7 +510,6 @@ print(BKP:::my_2D_plot_fun("True3", title = "True Probability", data = df))
 dev.off()
 
 
-#-------------------------- Classification ------------------------
 #-------------------------- Example 7 ----------------------------
 set.seed(123)
 data(iris)
@@ -626,8 +622,6 @@ pdf("ex7LGP.pdf", width = 13, height = 6)
 grid.arrange(p1, p2, ncol = 2)
 dev.off()
 
-
-
 #-------------------------- Example 8 ----------------------------
 set.seed(123)
 # True probability function from Example 2
@@ -676,8 +670,47 @@ legend(x = -2.22,y = 0.85,
        inset = 0.02)
 dev.off()
 
+#-------------------------- Example 9 ----------------------------
+set.seed(123)
+# Define true class probability function (3-class)
+true_pi_fun <- function(X) {
+  p1 <- 1/(1+exp(-3*X))
+  p2 <- (1 + exp(-X^2) * cos(10 * (1 - exp(-X)) / (1 + exp(-X)))) / 2
+  return(matrix(c(p1/2, p2/2, 1 - (p1+p2)/2), nrow = length(p1)))
+}
+# Data points
+n <- 500
+Xbounds <- matrix(c(-2, 2), nrow = 1)
+X <- lhs(n = n, rect = Xbounds)
+true_pi <- true_pi_fun(X)
+m <- sample(150, n, replace = TRUE)
+Y <- t(sapply(1:n, function(i) rmultinom(1, size = m[i], prob = true_pi[i, ])))
 
-#-----------------------------------------------------------------
+# Fit TwinDKP model
+TwinDKP_model_1D <- fit_TwinDKP(X, Y, Xbounds = Xbounds)
+
+# New data points
+Xnew <- matrix(seq(-2,2, length = 100), ncol=1)
+true_pi <- true_pi_fun(Xnew)
+
+# Plot results
+pdf("ex9.pdf", width = 8,height = 8)
+plot(TwinDKP_model_1D)
+plot(Xnew, true_pi[, 1], type = "l", col = "black",
+     xlab = "x", ylab = "Probability", ylim = c(0, 1),
+     main = "True Probability", lwd = 2)
+lines(Xnew, true_pi[, 2], col = "red", lwd = 2)
+lines(Xnew, true_pi[, 3], col = "blue", lwd = 2)
+legend("topright",
+       bty = "n",
+       legend = c("Class 1", "Class 2", "Class 3"),
+       col = c("black", "red", "blue"), lty = 1, lwd = 2)
+dev.off()
+
+
+
+
+
 # ============================================================== #
 # ========================= Real Example ======================= #
 # ============================================================== #
@@ -788,220 +821,3 @@ cat("Mean Squared Error (LGP) on the test data:", mse_gp, "\n")
 
 
 
-
-
-
-
-
-
-
-
-
-
-# =========================
-# 0) Packages
-# =========================
-library(BKP)
-library(ggplot2)
-library(sf)
-library(viridis)
-library(patchwork)
-library(rnaturalearth)
-
-# （可选但推荐）避免 s2 几何带来的 st_intersects/st_union 小概率报错
-sf::sf_use_s2(FALSE)
-
-# =========================
-# 1) Load & split data
-# =========================
-data("Loaloa")
-
-X <- as.matrix(Loaloa[, 1:2])
-rownames(X) <- NULL
-y <- Loaloa$npos
-m <- Loaloa$ntot
-
-set.seed(123)
-train_idx <- sample(1:nrow(Loaloa), 0.7 * nrow(Loaloa))
-
-X_train <- X[train_idx, ]
-y_train <- y[train_idx]
-m_train <- m[train_idx]
-
-X_test <- X[-train_idx, ]
-y_test <- y[-train_idx]
-m_test <- m[-train_idx]
-
-p <- y / m
-Xbounds <- matrix(c(7.8, 15.3, 3.1, 7.0), ncol = 2, byrow = TRUE)
-
-# 观测点（不要再用 df 这个名字，避免后面被覆盖）
-df_pts <- data.frame(
-  lon = X[,1], lat = X[,2], p = p, n = m,
-  set = ifelse(1:nrow(Loaloa) %in% train_idx, "Train", "Test")
-)
-
-# =========================
-# 2) Africa sf + crop + land polygon (mask)
-# =========================
-africa <- ne_countries(continent = "africa", scale = "medium", returnclass = "sf")
-
-africa_crop <- st_crop(
-  africa,
-  xmin = Xbounds[1,1], xmax = Xbounds[1,2],
-  ymin = Xbounds[2,1], ymax = Xbounds[2,2]
-)
-
-africa_crop <- st_make_valid(africa_crop)
-africa_crop <- st_transform(africa_crop, 4326)
-
-# 合并成一个“陆地整体”多边形（去掉内部国界）
-land_poly <- st_union(africa_crop)
-
-# =========================
-# 3) Fit models
-# =========================
-Loaloa_bkp_model <- fit_BKP(
-  X_train, y_train, m_train, Xbounds#,
-  #loss = "brier", prior = "adaptive", r0 = mean(m_train)
-)
-
-library(gplite)  # 你用的 LGP / gp_* 函数来自这里（如果不是，请按你实际包名调整）
-Loaloa_gp_model <- gp_init(cf = cf_sexp(), lik = lik_binomial())
-Loaloa_gp_model <- gp_optim(
-  Loaloa_gp_model, X_train, y_train, trials = m_train,
-  method = method_full(), approx = approx_ep(), verbose = FALSE
-)
-
-# =========================
-# 4) Grid + inside_land
-# =========================
-lon_seq <- seq(Xbounds[1, 1], Xbounds[1, 2], length.out = 140)
-lat_seq <- seq(Xbounds[2, 1], Xbounds[2, 2], length.out = 140)
-grid_df <- expand.grid(lon = lon_seq, lat = lat_seq)
-X_grid  <- as.matrix(grid_df)
-
-grid_sf <- st_as_sf(grid_df, coords = c("lon","lat"), crs = 4326, remove = FALSE)
-inside_land <- lengths(st_intersects(grid_sf, land_poly)) > 0
-
-# =========================
-# 5) Predict BKP / LGP on grid
-# =========================
-pred_bkp <- predict(Loaloa_bkp_model, Xnew = X_grid, CI_level = 0.95)
-surf_bkp <- data.frame(
-  lon = grid_df$lon,
-  lat = grid_df$lat,
-  Mean     = pred_bkp$mean,
-  Variance = pred_bkp$variance,
-  Lower    = pred_bkp$lower,
-  Upper    = pred_bkp$upper
-)
-
-pred_gp <- gp_pred(
-  Loaloa_gp_model, X_grid,
-  transform = TRUE, var = TRUE,
-  quantiles = c(0.025, 0.975)
-)
-surf_gp <- data.frame(
-  lon = grid_df$lon,
-  lat = grid_df$lat,
-  Mean     = pred_gp$mean,
-  Variance = pred_gp$var,
-  Lower    = pred_gp$quantiles[,1],
-  Upper    = pred_gp$quantiles[,2]
-)
-
-# =========================
-# 6) Mask: keep predictions ONLY on land
-# =========================
-mask_cols <- c("Mean","Variance","Lower","Upper")
-surf_bkp[!inside_land, mask_cols] <- NA
-surf_gp[!inside_land,  mask_cols] <- NA
-
-# =========================
-# 7) Plot helper: geom_sf outline + raster (NA transparent)
-# =========================
-plot_metric_land <- function(surface_df, metric, title,
-                             africa_crop, pts_df, Xbounds,
-                             show_points = TRUE,
-                             show_contour = FALSE,
-                             contour_bins = 12) {
-
-  g <- ggplot() +
-    theme_minimal() +
-    theme(
-      panel.background = element_rect(fill = "gray98", color = NA)
-    ) +
-    # 预测面（海里是 NA -> 透明）
-    geom_raster(
-      data = surface_df,
-      aes(x = lon, y = lat, fill = .data[[metric]]),
-      interpolate = TRUE,
-      alpha = 0.95
-    ) +
-    scale_fill_viridis_c(name = metric, na.value = "transparent") +
-
-    # 可选等高线（只会在陆地的有值区域画）
-    {if (show_contour)
-      geom_contour(
-        data = surface_df,
-        aes(x = lon, y = lat, z = .data[[metric]]),
-        bins = contour_bins,
-        linewidth = 0.25,
-        alpha = 0.7
-      )
-    } +
-
-    # 海岸线/国界线：放最上层，保证清晰
-    geom_sf(
-      data = africa_crop,
-      fill = NA,
-      color = "gray10",
-      linewidth = 0.45
-    ) +
-
-    coord_sf(xlim = Xbounds[1, ], ylim = Xbounds[2, ], expand = FALSE) +
-    labs(title = title, x = "Longitude", y = "Latitude")
-
-  if (show_points) {
-    g <- g +
-      geom_point(
-        data = pts_df,
-        aes(x = lon, y = lat, shape = set),
-        color = "black", size = 2, alpha = 0.85
-      ) +
-      scale_shape_manual(values = c("Train" = 16, "Test" = 17), name = "Dataset")
-  }
-
-  g
-}
-
-# =========================
-# 8) BKP plots (2×2) + save
-# =========================
-p_bkp_mean  <- plot_metric_land(surf_bkp, "Mean",     "BKP: Predictive Mean",
-                                africa_crop, df_pts, Xbounds, show_contour = TRUE)
-p_bkp_upper <- plot_metric_land(surf_bkp, "Upper",    "BKP: 95% CI Upper",
-                                africa_crop, df_pts, Xbounds)
-p_bkp_var   <- plot_metric_land(surf_bkp, "Variance", "BKP: Predictive Variance",
-                                africa_crop, df_pts, Xbounds)
-p_bkp_lower <- plot_metric_land(surf_bkp, "Lower",    "BKP: 95% CI Lower",
-                                africa_crop, df_pts, Xbounds)
-
-p_bkp_all <- (p_bkp_mean | p_bkp_upper) / (p_bkp_var | p_bkp_lower)
-ggsave("Loaloa_bkp_sf_land.pdf", plot = p_bkp_all, width = 16, height = 8)
-
-# =========================
-# 9) LGP plots (2×2) + save
-# =========================
-p_gp_mean  <- plot_metric_land(surf_gp, "Mean",     "LGP (EP): Predictive Mean",
-                               africa_crop, df_pts, Xbounds, show_contour = TRUE)
-p_gp_upper <- plot_metric_land(surf_gp, "Upper",    "LGP (EP): 95% CI Upper",
-                               africa_crop, df_pts, Xbounds)
-p_gp_var   <- plot_metric_land(surf_gp, "Variance", "LGP (EP): Predictive Variance",
-                               africa_crop, df_pts, Xbounds)
-p_gp_lower <- plot_metric_land(surf_gp, "Lower",    "LGP (EP): 95% CI Lower",
-                               africa_crop, df_pts, Xbounds)
-
-p_gp_all <- (p_gp_mean | p_gp_upper) / (p_gp_var | p_gp_lower)
-ggsave("Loaloa_gp_sf_land.pdf", plot = p_gp_all, width = 16, height = 8)
