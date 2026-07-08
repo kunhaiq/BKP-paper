@@ -39,7 +39,7 @@ BKP_model_1D_1 <- fit_BKP(X, y, m, Xbounds = Xbounds)
 print(BKP_model_1D_1)
 
 # New data points
-Xnew = matrix(seq(-2, 2, length = 100), ncol = 1)
+Xnew <- matrix(seq(-2, 2, length = 100), ncol = 1)
 true_pi <- true_pi_fun(Xnew)
 
 # Plot results
@@ -69,10 +69,10 @@ dev.off()
 set.seed(123)
 # Data points
 n <- 20
-Xbounds <- matrix(c(-2,2), nrow = 1)
+Xbounds <- matrix(c(-2, 2), nrow = 1)
 X <- lhs(n = n, rect = Xbounds)
 true_pi <- true_pi_fun(X)
-m <- rep(1,n)
+m <- rep(1, n)
 y <- as.numeric(true_pi > 0.5)
 
 # Fit BKP model with r0 = 0.01
@@ -172,7 +172,7 @@ m <- sample(100, n, replace = TRUE)
 y <- rbinom(n, size = m, prob = true_pi)
 
 # Fit BKP model
-BKP_model_2D <- fit_BKP(X, y, m, Xbounds=Xbounds)
+BKP_model_2D <- fit_BKP(X, y, m, Xbounds = Xbounds)
 
 # Print BKP model
 print(BKP_model_2D)
@@ -191,7 +191,8 @@ true_pi <- true_pi_fun(Xnew)
 df <- data.frame(x1 = Xnew$Xnew1, x2 = Xnew$Xnew2,
                  True = true_pi)
 # Use BKP's internal 2D plotting helper to reproduce the contour-style plot.
-# The function is non-exported; see ?my_2D_plot_fun for its internal help page.
+# The function is non-exported; see help("my_2D_plot_fun", package = "BKP")
+# for its internal help page.
 print(BKP:::my_2D_plot_fun("True", title = "True Probability", data = df))
 dev.off()
 
@@ -480,7 +481,7 @@ m <- sample(150, n, replace = TRUE)
 Y <- t(sapply(1:n, function(i) rmultinom(1, size = m[i], prob = true_pi[i, ])))
 
 # Fit DKP model
-DKP_model_2D <- fit_DKP(X, Y, Xbounds=Xbounds)
+DKP_model_2D <- fit_DKP(X, Y, Xbounds = Xbounds)
 
 # Plot results
 pdf(file = "ex6_class%d.pdf", width = 9, height = 8, onefile = FALSE)
@@ -553,7 +554,7 @@ for (class_name in class_levels) {
 # Plot ROC curve
 pdf("ex7roc.pdf", width = 6, height = 6)
 plot(all_rocs[[1]], col = "blue", lwd = 2, lty = 1,
-     main = paste("One-vs-Rest ROC curve for BKP (AUC =", round(auc(multiclass_roc_dkp), 3), ")", sep = ""))
+     main = paste("One-vs-Rest ROC curve for DKP (AUC =", round(auc(multiclass_roc_dkp), 3), ")", sep = ""))
 lines(all_rocs[[2]], col = "red", lwd = 2, lty = 2)
 lines(all_rocs[[3]], col = "black", lwd = 2, lty = 4)
 legend("bottomright",
@@ -646,21 +647,13 @@ TwinBKP_model_1D_2 <- fit_TwinBKP(X, y, m, Xbounds = Xbounds)
 ## Print fitted model
 print(TwinBKP_model_1D_2)
 
-## Inspect realized TwinBKP control settings
-TwinBKP_model_1D_2$control[c("g", "l", "twins")]
-
-## Prediction grid
+## New data points
 Xnew <- matrix(seq(-2, 2, length = 100), ncol = 1)
-
-## Posterior prediction
-TwinBKP_pred_1D_2 <- predict(TwinBKP_model_1D_2, Xnew = Xnew)
-print(TwinBKP_pred_1D_2)
-
+true_pi <- true_pi_fun(Xnew)
 
 ## Plot fitted TwinBKP posterior summaries
 pdf("ex8.pdf", width = 9, height = 6)
 plot(TwinBKP_model_1D_2)
-true_pi <- true_pi_fun(Xnew)
 lines(Xnew,true_pi, col = "black", lwd = 2)
 legend(x = -2.22,y = 0.85,
        legend = "True Probability",
@@ -706,10 +699,6 @@ legend("topright",
        legend = c("Class 1", "Class 2", "Class 3"),
        col = c("black", "red", "blue"), lty = 1, lwd = 2)
 dev.off()
-
-
-
-
 
 # ============================================================== #
 # ========================= Real Example ======================= #
