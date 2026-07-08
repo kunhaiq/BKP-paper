@@ -27,11 +27,6 @@ options(
   useFancyQuotes = FALSE
 )
 
-## Create the output directory for figures if it does not already exist.
-## This avoids errors when pdf() is called with a path inside code/figure/.
-dir.create("code/figure", recursive = TRUE, showWarnings = FALSE)
-
-
 ## -------------------------------------------------------------------------
 ## Part I: Binomial probability-surface estimation
 ## -------------------------------------------------------------------------
