@@ -27,6 +27,10 @@ options(
   useFancyQuotes = FALSE
 )
 
+## Create output directories if they do not already exist. This makes the
+## script runnable from a clean clone of the repository.
+dir.create("code/figure", recursive = TRUE, showWarnings = FALSE)
+
 ## -------------------------------------------------------------------------
 ## Part I: Binomial probability-surface estimation
 ## -------------------------------------------------------------------------
