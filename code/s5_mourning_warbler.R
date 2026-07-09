@@ -13,10 +13,10 @@ library(pROC)
 library(gridExtra)
 library(terra)
 library(RColorBrewer)
-set.seed(42)
+set.seed(123)
 
 # ---- Load data ---------------------------------------------------
-data <- read.csv("Code/Mourning_Warbler.csv", stringsAsFactors = FALSE)
+data <- read.csv("code/data/Mourning_Warbler.csv", stringsAsFactors = FALSE)
 cat(sprintf("Data dimensions: %d rows x %d cols\n", nrow(data), ncol(data)))
 cat("Split distribution:\n"); print(table(data$split))
 
@@ -46,7 +46,11 @@ cat(sprintf("Cropped raster: %d rows x %d cols x %d layers\n",
             nrow(na_clim), ncol(na_clim), nlyr(na_clim)))
 
 # ---- Colors and base map prep ------------------------------------
-make_rast <- function(vals, template) { r <- rast(template[[1]]); values(r) <- vals; r }
+make_rast <- function(vals, template) { 
+  r <- rast(template[[1]])
+  values(r) <- vals
+  return(r) 
+}
 
 purples <- colorRampPalette(brewer.pal(9, "Purples")[-(1:2)])
 greens  <- colorRampPalette(brewer.pal(9, "Greens")[-(1:2)])
@@ -92,8 +96,8 @@ all_rocs <- list(); all_preds <- list(); times <- c()
 cat("\n===== BKP =====\n")
 t1 <- system.time({
   bkp_fit <- fit_BKP(X_train, y_train, m_train, Xbounds = Xbounds,
-                      prior = "fixed", r0 = 0.1, loss = "log_loss",
-                      kernel = "gaussian", isotropic = TRUE)
+                     prior = "fixed", r0 = 0.1, loss = "log_loss",
+                     kernel = "gaussian", isotropic = TRUE)
 })
 bkp_pred_test <- predict(bkp_fit, Xnew = X_test)
 bkp_roc <- roc(y_test, bkp_pred_test$mean)
@@ -106,8 +110,9 @@ t2 <- system.time({
                           prior = "fixed", r0 = 0.1, loss = "log_loss",
                           global_kernel = "gaussian", local_kernel = "wendland",
                           isotropic = TRUE)
+  twin_pred_test <- predict(twin_fit, Xnew = X_test)
 })
-twin_pred_test <- predict(twin_fit, Xnew = X_test)
+
 twin_roc <- roc(y_test, twin_pred_test$mean)
 all_rocs$TwinBKP <- twin_roc; all_preds$TwinBKP <- twin_pred_test$mean
 times <- c(times, TwinBKP = unname(t2["elapsed"]))

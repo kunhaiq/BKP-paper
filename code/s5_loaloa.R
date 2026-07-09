@@ -1,8 +1,6 @@
 # ==============================================================
 # Real Data Example: Loaloa (BKP vs LGP)
 # ==============================================================
-rm(list = ls()) 
-
 library(BKP)
 library(gplite)
 library(ggplot2)
@@ -17,6 +15,8 @@ library(viridis)
 
 options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
 
+set.seed(123)
+
 # ---- Load data -------------------------------------------------
 data("loaloa", package = "RiskMap") 
 
@@ -27,7 +27,6 @@ y <- loaloa$NO_INF
 m <- loaloa$NO_EXAM
 
 # Randomly split into training (70%) and testing (30%) sets
-set.seed(123)
 train_idx <- sample(1:nrow(loaloa), 0.7 * nrow(loaloa))
 X_train <- X[train_idx, ]
 y_train <- y[train_idx]
@@ -49,7 +48,7 @@ df_map <- data.frame(
   set = ifelse(1:nrow(loaloa) %in% train_idx, "Train", "Test")
 )
 
-ggplot() +
+pmap <- ggplot() +
   geom_sf(data = africa, fill = "gray95", color = "gray60") +
   geom_point(data = df_map,
              aes(x = lon, y = lat, color = p, size = n, shape = set),
@@ -61,7 +60,7 @@ ggplot() +
   theme_minimal() +
   labs(title = "Loaloa infection proportion (y/m): Train vs Test",
        x = "Longitude", y = "Latitude")
-ggsave("Loaloa_map.pdf", width = 10, height = 5, dpi = 300)
+ggsave("code/figure/Loaloa_map.pdf", plot = pmap, width = 10, height = 5, dpi = 300)
 
 # ---- Model fitting ------------------------------------------------
 all_preds <- list()
@@ -139,14 +138,14 @@ all_probs <- list()
 all_vars  <- list()
 for (method in names(raster_preds)) {
   rp <- raster_preds[[method]]
-
+  
   df_method <- data.frame(
     lon      = grid_land$lon,
     lat      = grid_land$lat,
     mean     = rp$mean,
     variance = rp$variance
   )
-
+  
   # Probability map
   p_prob <- ggplot() +
     geom_sf(data = africa, fill = grey(0.8), colour = "gray60") +
@@ -174,7 +173,7 @@ for (method in names(raster_preds)) {
     )
   ggsave(sprintf("Loaloa_%s_prob.pdf", tolower(method)),
          p_prob, width = 6.5, height = 3.8, dpi = 300)
-
+  
   # Variance map
   p_var <- ggplot() +
     geom_sf(data = africa, fill = grey(0.8), colour = "gray60") +
@@ -202,7 +201,7 @@ for (method in names(raster_preds)) {
     )
   ggsave(sprintf("Loaloa_%s_var.pdf", tolower(method)),
          p_var, width = 6.5, height = 3.8, dpi = 300)
-
+  
   all_probs[[method]] <- p_prob
   all_vars[[method]]  <- p_var
 }
