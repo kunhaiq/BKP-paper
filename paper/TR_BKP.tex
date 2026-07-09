@@ -1022,8 +1022,7 @@ We compare the prediction performance with the LGP model implemented by R packag
 \begin{CodeChunk}
 \begin{CodeInput}
 R> gp <- gp_init(cf = cf_sexp(), lik = lik_bernoulli())
-R> gp <- gp_optim(gp, X_train, y_train, method = method_full(),
-+                 approx = approx_ep(), verbose = FALSE) 
+R> gp <- gp_optim(gp, X_train, y_train, verbose = FALSE) 
 R> prediction_gp <- gp_pred(gp, as.matrix(X_test), transform = TRUE)
 \end{CodeInput}
 \end{CodeChunk} 
@@ -1399,9 +1398,7 @@ For comparison, we also fit a logistic Gaussian process (LGP) model using the \f
 \begin{CodeChunk}
 \begin{CodeInput}   
 R> gp <- gp_init(cf = cf_sexp(), lik = lik_binomial())
-R> gp <- gp_optim(gp, X_train, y_train, trials = m_train,
-+                 method = method_full(), approx = approx_ep(), 
-+                 verbose = FALSE)
+R> gp <- gp_optim(gp, X_train, y_train, trials = m_train, verbose = FALSE)
 \end{CodeInput} 
 \end{CodeChunk}  
 

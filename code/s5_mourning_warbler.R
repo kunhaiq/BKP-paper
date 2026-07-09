@@ -36,7 +36,7 @@ Xbounds <- apply(X_train, 2, range); Xbounds <- t(Xbounds)
 
 # ---- Load climate rasters ----------------------------------------
 cat("\n===== Loading climate rasters =====\n")
-tif_dir <- "climate/wc2.1_10m"
+tif_dir <- "code/data/climate/wc2.1_10m"
 tif_files <- file.path(tif_dir, paste0(bio_cols, ".tif"))
 na_clim <- rast(tif_files)
 e <- ext(-170.15, -46.70, 22.23, 71.90)
@@ -73,7 +73,7 @@ bg_df <- as.data.frame(bg_rast, xy = TRUE)
 colnames(bg_df)[3] <- "land"
 
 # ---- Distribution data map ---------------------------------------
-ggplot() +
+map_distribution <- ggplot() +
   geom_tile(data = bg_df, aes(x = x, y = y, fill = land)) +
   scale_fill_gradientn(colours = grey(0.8), na.value = "transparent", guide = "none") +
   geom_point(data = pts_test, aes(x = lon, y = lat),
@@ -88,7 +88,9 @@ ggplot() +
   coord_quickmap(xlim = c(-170, -50), ylim = c(15, 75), expand = FALSE) +
   labs(title = "Distribution data - Mourning Warbler", x = NULL, y = NULL) +
   theme_void(12) + theme(plot.title = element_text(hjust = 0.5, face = "bold"))
-ggsave("mourning_warbler_map_distribution.pdf", width = 6.5, height = 3.8, dpi = 300)
+ggsave("code/figure/mourning_warbler_map_distribution.pdf", 
+       plot = map_distribution,
+       width = 6.5, height = 3.8, dpi = 300)
 
 # ---- Model fitting -----------------------------------------------
 all_rocs <- list(); all_preds <- list(); times <- c()
@@ -98,11 +100,12 @@ t1 <- system.time({
   bkp_fit <- fit_BKP(X_train, y_train, m_train, Xbounds = Xbounds,
                      prior = "fixed", r0 = 0.1, loss = "log_loss",
                      kernel = "gaussian", isotropic = TRUE)
+  bkp_pred_test <- predict(bkp_fit, Xnew = X_test)
 })
-bkp_pred_test <- predict(bkp_fit, Xnew = X_test)
+times <- c(times, BKP = unname(t1["elapsed"]))
 bkp_roc <- roc(y_test, bkp_pred_test$mean)
 all_rocs$BKP <- bkp_roc; all_preds$BKP <- bkp_pred_test$mean
-times <- c(times, BKP = unname(t1["elapsed"]))
+
 
 cat("\n===== TwinBKP =====\n")
 t2 <- system.time({
@@ -112,18 +115,21 @@ t2 <- system.time({
                           isotropic = TRUE)
   twin_pred_test <- predict(twin_fit, Xnew = X_test)
 })
-
+times <- c(times, TwinBKP = unname(t2["elapsed"]))
 twin_roc <- roc(y_test, twin_pred_test$mean)
 all_rocs$TwinBKP <- twin_roc; all_preds$TwinBKP <- twin_pred_test$mean
-times <- c(times, TwinBKP = unname(t2["elapsed"]))
+
 
 cat("\n===== LGP =====\n")
-gp <- gp_init(cf = cf_sexp(), lik = lik_bernoulli())
-t3 <- system.time({ gp <- gp_optim(gp, X_train, y_train, verbose = FALSE) })
-gp_pred_test <- gp_pred(gp, X_test, transform = TRUE)
+t3 <- system.time({ 
+  gp <- gp_init(cf = cf_sexp(), lik = lik_bernoulli())
+  gp <- gp_optim(gp, X_train, y_train, verbose = FALSE) 
+  gp_pred_test <- gp_pred(gp, X_test, transform = TRUE)
+})
+times <- c(times, LGP = unname(t3["elapsed"]))
 gp_roc <- roc(y_test, gp_pred_test$mean)
 all_rocs$LGP <- gp_roc; all_preds$LGP <- gp_pred_test$mean
-times <- c(times, LGP = unname(t3["elapsed"]))
+
 
 # ---- Comparison ---------------------------------------------------
 cat("\n=============================================================\n")
@@ -140,7 +146,7 @@ cols <- c("#1c61b6", "#fdae61", "#d7191c")
 nm_pad <- format(names(all_rocs), justify = "none",
                  width = max(nchar(names(all_rocs))))
 legend_lines <- sprintf("%s  (AUC=%.3f)", nm_pad, sapply(all_rocs, auc))
-pdf("mourning_warbler_roc_comparison.pdf", 6, 6)
+pdf("code/figure/mourning_warbler_roc_comparison.pdf", 6, 6)
 plot(all_rocs[[1]], col = cols[1], lwd = 2,
      main = "ROC Curve: Mourning Warbler")
 for (i in seq_len(n_methods)[-1])
@@ -218,8 +224,8 @@ for (method in names(raster_preds)) {
       legend.ticks.length = unit(0.2, "cm"),
       legend.title = element_text(angle = 90, hjust = 0.5, vjust = 0.5, size = 10)
     )
-  ggsave(sprintf("mourning_warbler_map_%s_prob.pdf", tolower(gsub(" ", "_", method))),
-         p_prob, width = 6.5, height = 3.8, dpi = 300)
+  # ggsave(sprintf("mourning_warbler_map_%s_prob.pdf", tolower(gsub(" ", "_", method))),
+         # p_prob, width = 6.5, height = 3.8, dpi = 300)
   
   r_var <- make_rast(rp$variance, na_clim)
   df_var <- as.data.frame(r_var, xy = TRUE); colnames(df_var)[3] <- "var"
@@ -247,8 +253,8 @@ for (method in names(raster_preds)) {
       legend.ticks.length = unit(0.2, "cm"),
       legend.title = element_text(angle = 90, hjust = 0.5, vjust = 0.5, size = 10)
     )
-  ggsave(sprintf("mourning_warbler_map_%s_var.pdf", tolower(gsub(" ", "_", method))),
-         p_var, width = 6.5, height = 3.8, dpi = 300)
+  # ggsave(sprintf("mourning_warbler_map_%s_var.pdf", tolower(gsub(" ", "_", method))),
+  #        p_var, width = 6.5, height = 3.8, dpi = 300)
   
   all_probs[[method]] <- p_prob
   all_vars[[method]]  <- p_var
@@ -262,7 +268,7 @@ p_combined <- grid.arrange(
   all_probs$LGP,     all_vars$LGP,
   ncol = 2, nrow = 3
 )
-ggsave("mourning_warbler_map_combined.pdf", p_combined,
+ggsave("code/figure/mourning_warbler_map_combined.pdf", plot = p_combined,
        width = 13.0, height = 11.4, dpi = 300)
 
 cat("\n===== Analysis complete =====\n")

@@ -64,32 +64,24 @@ ggsave("code/figure/Loaloa_map.pdf", plot = pmap, width = 10, height = 5, dpi = 
 
 # ---- Model fitting ------------------------------------------------
 all_preds <- list()
-times     <- c()
 
 # BKP 
-t1 <- system.time({
-  bkp_fit <- fit_BKP(X_train, y_train, m_train, Xbounds = Xbounds)
-})
-summary(bkp_fit)
+bkp_fit <- fit_BKP(X_train, y_train, m_train, Xbounds = Xbounds)
 all_preds$BKP <- predict(bkp_fit, Xnew = X_test)$mean
-times <- c(times, BKP = unname(t1["elapsed"]))
+summary(bkp_fit)
 
 # LGP 
 gp <- gp_init(cf = cf_sexp(), lik = lik_binomial())
-t2 <- system.time({
-  gp <- gp_optim(gp, X_train, y_train, trials = m_train,
-                 method = method_full(), approx = approx_ep(), verbose = FALSE)
-})
+gp <- gp_optim(gp, X_train, y_train, trials = m_train, verbose = FALSE)
 all_preds$LGP <- gp_pred(gp, X_test, transform = TRUE)$mean
-times <- c(times, LGP = unname(t2["elapsed"]))
 
 # ---- Comparison ----------------------------------------------------
 cat("\n=============================================================\n")
 cat("  Comparison: Loaloa (BKP vs LGP)\n")
 cat("=============================================================\n")
 for (nm in names(all_preds)) {
-  cat(sprintf("  %-8s | Brier: %.6f | Time: %.2f s\n",
-              nm, mean((all_preds[[nm]] - pi_test)^2), times[nm]))
+  cat(sprintf("  %-8s | Brier: %.6f \n",
+              nm, mean((all_preds[[nm]] - pi_test)^2)))
 }
 
 # ---- Land‑only grid prediction ------------------------------------
@@ -171,8 +163,8 @@ for (method in names(raster_preds)) {
       legend.ticks.length = unit(0.2, "cm"),
       legend.title = element_text(angle = 90, hjust = 0.5, vjust = 0.5, size = 10)
     )
-  ggsave(sprintf("Loaloa_%s_prob.pdf", tolower(method)),
-         p_prob, width = 6.5, height = 3.8, dpi = 300)
+  # ggsave(sprintf("Loaloa_%s_prob.pdf", tolower(method)),
+  #        p_prob, width = 6.5, height = 3.8, dpi = 300)
   
   # Variance map
   p_var <- ggplot() +
@@ -199,8 +191,8 @@ for (method in names(raster_preds)) {
       legend.ticks.length = unit(0.2, "cm"),
       legend.title = element_text(angle = 90, hjust = 0.5, vjust = 0.5, size = 10)
     )
-  ggsave(sprintf("Loaloa_%s_var.pdf", tolower(method)),
-         p_var, width = 6.5, height = 3.8, dpi = 300)
+  # ggsave(sprintf("Loaloa_%s_var.pdf", tolower(method)),
+  #        p_var, width = 6.5, height = 3.8, dpi = 300)
   
   all_probs[[method]] <- p_prob
   all_vars[[method]]  <- p_var
@@ -213,7 +205,7 @@ p_combined <- grid.arrange(
   all_probs$LGP, all_vars$LGP,
   ncol = 2, nrow = 2
 )
-ggsave("Loaloa_combined.pdf", p_combined,
+ggsave("code/figure/Loaloa_combined.pdf", plot = p_combined,
        width = 13, height = 9, dpi = 300)
 
 cat("\n===== Analysis complete =====\n")

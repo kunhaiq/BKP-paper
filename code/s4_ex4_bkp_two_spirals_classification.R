@@ -140,14 +140,7 @@ dev.off()
 ## the likelihood is Bernoulli, and posterior approximation is performed
 ## using expectation propagation through approx_ep().
 gp <- gp_init(cf = cf_sexp(), lik = lik_bernoulli())
-gp <- gp_optim(
-  gp,
-  X_train,
-  y_train,
-  method = method_full(),
-  approx = approx_ep(),
-  verbose = FALSE
-)
+gp <- gp_optim(gp, X_train, y_train, verbose = FALSE)
 
 ## Compute LGP posterior predictions on the test inputs.
 prediction_gp <- gp_pred(gp, as.matrix(X_test), transform = TRUE)
