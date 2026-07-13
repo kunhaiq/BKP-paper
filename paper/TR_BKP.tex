@@ -15,6 +15,7 @@
 \usepackage{dsfont, pifont}
 \usepackage{multirow}
 \usepackage{soul} 
+\usepackage{placeins}
 
 \usepackage{graphicx}
 \graphicspath{{../code/figure/}{code/figure/}}
@@ -53,7 +54,7 @@
 	The package implements the Beta Kernel Process (BKP), which uses kernel-weighted pseudo-count aggregation and beta-binomial conjugacy to obtain closed-form conjugate posterior summaries and posterior predictive distributions for binomial probabilities. 
 	It also implements the Dirichlet Kernel Process (DKP) for multi-class responses, together with TwinBKP and TwinDKP, scalable twinning-based global-local approximations for larger datasets. 
 	The resulting workflow supports transparent kernel-weighted evidence borrowing, several kernel families, fixed and data-adaptive priors, effective-sample-size calibration, loss-based hyperparameter tuning, and standard S3 methods for fitting, prediction, simulation, visualization, and extraction of posterior summaries. 
-	Reproducible examples demonstrate probability-surface estimation, binary and multi-class classification, computational comparison, and real-data applications to \emph{Loa loa} infection prevalence mapping and \emph{Mourning Warbler} distribution modeling.
+	Reproducible examples demonstrate probability-surface estimation, binary and multi-class classification, computational comparison, and real-data applications to \emph{Loa loa} infection prevalence mapping and Mourning Warbler distribution modeling.
 }
 
 %% - \Keywords{} with LaTeX markup, at least one required
@@ -638,7 +639,7 @@ The main user-facing functions and S3 methods are summarized in Table~\ref{tab:m
 
 We begin with the full BKP interface, which provides the baseline workflow for model fitting, posterior prediction, posterior simulation, visualization, and numerical extraction. The DKP model in Section~\ref{sec:DKP_pkg} follows the same workflow but differs in the response format, posterior distribution, and multi-class prediction summaries. The TwinBKP and TwinDKP models in Section~\ref{sec:Twin_pkg} retain the corresponding BKP and DKP response formats, while replacing full kernel aggregation with the scalable global-local approximation described in Section~\ref{sec:TwinBKP}.
 
-\subsubsection{Model fitting}
+\subsubsection{Model Fitting}
 
 The function \fct{fit\_BKP} fits the BKP model in \eqref{eq:BKP_model} for binary or aggregated binomial response data. Its main arguments are
 \begin{Code}
@@ -666,7 +667,7 @@ The function \fct{fit\_BKP} returns an object of class \class{BKP}. The object s
 
 The resulting \class{BKP} object can be passed as the \code{object} argument to \fct{predict}, \fct{simulate}, and \fct{summary}, or as the \code{x} argument to \fct{plot} and \fct{print}.
 
-\subsubsection{Methods for fitted BKP objects}
+\subsubsection{Methods for the Fitted BKP Objects}
 
 For a fitted \class{BKP} object \code{BKPmodel}, posterior prediction is obtained by
 \begin{Code}
@@ -963,7 +964,8 @@ In the present benchmark, the default isotropic Gaussian kernel is used, so $d_\
 The LGP model was implemented using the \fct{gp\_fit} and \fct{gp\_optim} functions from the \pkg{gplite} package \citep{Piironen2022gplite}. 
 The \pkg{gplite} package uses additional starts only when optimization failure is detected; hence, its timing results are not directly comparable to a fixed multi-start optimization budget.
 
-All experiments were conducted on a workstation equipped with an Intel(R) Xeon(R) W-2235 CPU @ 3.80GHz (12 cores) and 16 GB RAM. The computation times reported here are averages over 20 independent repetitions to mitigate the effects of variability due to random initialization and computational fluctuations.
+The timing experiments were conducted on the hardware described in the computational details.
+The reported computation times are averages over 20 independent repetitions to reduce variability due to random initialization and computational fluctuations.
 
 \begin{figure}[!t]
 	\centering 
@@ -1316,27 +1318,28 @@ Figure~\ref{fig:TwinDKP_1D} reports the fitted TwinDKP posterior summaries, with
 The TwinDKP fit follows the main features of the three class-probability functions while using the same global-local approximation as TwinBKP. 
 The posterior summaries retain the Dirichlet-multinomial interpretation of the full DKP model, but the pseudo-count vector at each prediction location is aggregated over the union of the twinning-selected global subset and the prediction-specific local subset.
 
+\FloatBarrier
 
 \section{Real-data Applications}\label{sec:real_data}
 
-This section illustrates the use of \pkg{BKP} in two real-data applications. 
-The first application considers spatial prevalence mapping of \emph{Loa loa} infection using aggregated binomial counts. 
-The second application considers species distribution modeling for the \emph{Mourning Warbler} using binary presence--absence data and high-dimensional environmental covariates.
+This section illustrates the use of \pkg{BKP} in two real-data applications: spatial prevalence mapping of \emph{Loa loa} infection using aggregated binomial counts, and species distribution modeling for the Mourning Warbler using binary presence--absence data and high-dimensional environmental covariates. 
+The data sources and preprocessing procedures are described in the corresponding subsections.
 
 \subsection{Loa loa infection prevalence mapping}\label{sec:loaloa}
 
 \subsubsection{Data Preparation}  
 
-The \code{loaloa} dataset, available in the \pkg{RiskMap} package, contains 197 observations collected in North Cameroon between 1991 and 2001.  
-For each surveyed location, the dataset records geographical coordinates (\code{LONGITUDE}, \code{LATITUDE}), the number of infected individuals (\code{NO_INF}), the total number of surveyed individuals (\code{NO_EXAM}), and additional environmental covariates such as altitude and the maximum normalized diference vegetation index (NDVI). 
+The \code{loaloa} dataset, available in the \pkg{RiskMap} package \citep{Giorgi2025RiskMap}, contains observations from 197 survey locations in North Cameroon collected between 1991 and 2001 \citep{Diggle2007Loa}.  
+For each location, the dataset records the geographical coordinates (\code{LONGITUDE} and \code{LATITUDE}), the number of infected individuals (\code{NO_INF}), the total number examined (\code{NO_EXAM}), and additional environmental variables, including altitude and the maximum normalized difference vegetation index (NDVI).
  
-In this analysis, we focus on geographical coordinates as predictors (\code{X}), the number of infected individuals as the response (\code{y}), and the total number surveyed as the trial counts (\code{m}).
-The dataset is randomly divided into a training set (70\%) and a testing set (30\%):  
+In this analysis, geographical coordinates are used as the input variables \code{X}, the number of infected individuals as the binomial success count \code{y}, and the number examined as the trial count \code{m}.
+For illustration, the locations are randomly divided into a training set containing 70\% of the observations and a testing set containing the remaining 30\%.
+%This random split evaluates prediction at held-out survey locations but is not intended as a strict assessment of spatial extrapolation to geographically separated regions. 
 
 \begin{CodeChunk}
 \begin{CodeInput}   
 R> data("loaloa", package = "RiskMap")  
-R> # Extract input variables (X), response variable (y), and trial counts (m)
+R> # Extract coordinates, infected counts, and numbers examined
 R> X <- as.matrix(loaloa[, c("LONGITUDE", "LATITUDE")]) 
 R> y <- loaloa$NO_INF
 R> m <- loaloa$NO_EXAM 
@@ -1351,22 +1354,23 @@ R> m_test <- m[-train_idx]
 \end{CodeInput} 
 \end{CodeChunk}   
 
-To investigate the spatial heterogeneity of infection prevalence, Figure~\ref{fig:Loaloa_map} presents the observed infection proportion ($y/m$) at each survey location. 
-The symbol size is proportional to the sample size, reflecting the relative precision of the observed proportions, while the color gradient encodes the infection rate ranging from 0.0 to 0.5. 
-The map further distinguishes between the training set (70\% of locations) and the testing set (30\% of locations), which are used for model fitting and predictive validation, respectively. 
-Distinct spatial patterns emerge, with clusters of elevated infection prevalence observed between $10^{\circ}$E and $12^{\circ}$E longitude and another group located between $14^{\circ}$E and $15^{\circ}$E longitude.  
+Figure~\ref{fig:Loaloa_map} displays the observed infection proportion $y/m$ at each survey location.
+Point size represents the number examined and therefore indicates the nominal amount of binomial information available at each location, while color represents the observed infection proportion.
+Point shape distinguishes the training and testing locations.
+The observed proportions exhibit substantial spatial heterogeneity, including groups of locations with elevated prevalence between approximately $10^{\circ}\mathrm{E}$ and $12^{\circ}\mathrm{E}$, and another group near $14^{\circ}\mathrm{E}\)--\(15^{\circ}\mathrm{E}$.
 
 \begin{figure}[!t]
     \centering 
     \includegraphics[width=\linewidth]{Loaloa_map.pdf}  
-    \caption{Observed infection proportions ($y/m$) across North Cameroon. Symbol size is proportional to the trial count, color indicates the observed infection rate, and shape distinguishes between training (circle, 70\% of locations) and testing (triangle, 30\% of locations) sets.}
+    \caption{Observed \emph{Loa loa} infection proportions \(y/m\) across North Cameroon. Point size is proportional to the number examined, color represents the observed infection proportion, and shape distinguishes the randomly selected training locations (circles; 70\%) from the testing locations (triangles; 30\%).}
     \label{fig:Loaloa_map}
 \end{figure}
 
-\subsubsection{Model fitting and visualization}  
+\subsubsection{Model Fitting and Visualization}  
 
-We fit the BKP model to the training data using the \fct{fit\_BKP} function. 
-By default, the model is trained with the Brier score as the loss function and a non-informative prior. An isotropic Gaussian kernel is automatically selected and its length-scale parameter is tuned via leave-one-out cross-validation.
+We fit a BKP model to the training data using \fct{fit\_BKP}.
+The default specification uses the Brier score for LOOCV-based length-scale selection, a non-informative beta prior, and an isotropic Gaussian kernel.
+The bounds supplied through \code{Xbounds} rescale longitude and latitude to the unit square before fitting.
 
 \begin{CodeChunk}
 \begin{CodeInput}
@@ -1393,7 +1397,7 @@ Posterior variances 0.0003 0.0001 0.0004 0.0000 0.0026
 \end{CodeOutput}
 \end{CodeChunk}  
 
-For comparison, we also fit a logistic Gaussian process (LGP) model using the \fct{gp\_init} and \fct{gp\_optim} functions from the \pkg{gplite} package \citep{Piironen2022gplite}.  
+For comparison, we also fit a logistic Gaussian process (LGP) model using \fct{gp\_init} and \fct{gp\_optim} from the \pkg{gplite} package \citep{Piironen2022gplite}.
 
 \begin{CodeChunk}
 \begin{CodeInput}   
@@ -1405,44 +1409,60 @@ R> gp <- gp_optim(gp, X_train, y_train, trials = m_train, verbose = FALSE)
 \begin{figure}[!t]
     \centering 
     \includegraphics[width=\linewidth]{Loaloa_combined.pdf}  
-    \caption{Posterior predictive mean and variance surfaces of the BKP and LGP models fitted to the \emph{Loa loa} dataset. The left column shows the predictive probabilities of prevalence, while the right column shows the prediction uncertainties (variance). Unified color scales are used across methods for direct comparison.}
+    \caption{Probability-scale prediction summaries for the BKP and LGP models fitted to the \emph{Loa loa} data. The left column shows fitted infection probabilities, and the right column shows the corresponding model-specific variance surfaces. Common color limits are used for the two probability panels and, separately, for the two variance panels.}
     \label{fig:Loaloa_combined}
 \end{figure}
 
-Figure~\ref{fig:Loaloa_combined} displays the posterior predictive mean and variance surfaces for both models, providing a comprehensive 2$\times$2 view of their predictive behavior. The posterior mean surface of the BKP model highlights clear spatial variation in \emph{Loa loa} infection risk, with elevated prevalence predicted in the central–eastern part of the study region. Notably, the predictive mean map from the BKP model effectively captures the major high-prevalence clusters, correctly identifying regions that correspond to the high-proportion areas observed in Figure~\ref{fig:Loaloa_map}. 
+Figure~\ref{fig:Loaloa_combined} compares the fitted probability and variance surfaces from the two models.
+The BKP probability surface contains several spatially connected regions of elevated predicted prevalence, including regions corresponding broadly to the higher observed proportions in Figure~\ref{fig:Loaloa_map}.
+The LGP surface is more diffuse over parts of the study region and contains a larger number of small-scale local features.
+These differences reflect the distinct smoothing constructions of the two methods:
+BKP aggregates kernel-weighted success and failure pseudo-counts directly on the probability scale,
+whereas LGP performs inference through a latent Gaussian process and a nonlinear link function.
 
-Compared with the BKP model, several important differences emerge in the LGP fit. First, the BKP predictive mean surface is smoother and spatially more coherent, identifying continuous regions of high and low infection prevalence. In contrast, the LGP predictive mean appears more fragmented, with multiple isolated pockets of elevated infection rates. Second, the predictive variance differs remarkably: the BKP variance surface is relatively uniform, indicating a consistent level of uncertainty across the study region, whereas the LGP variance surface exhibits highly localized areas of elevated uncertainty, suggesting less stable predictions in those specific locations. Overall, the BKP model provides a more robust and spatially coherent characterization of \emph{Loa loa} infection prevalence.  
+The variance surfaces also exhibit different spatial patterns.
+For BKP, larger posterior variances are concentrated mainly around transitions between lower- and higher-prevalence regions and in locations with weaker nearby data support.
+The LGP variance is more broadly distributed over the study region, with local reductions around some observed locations.
+Because BKP and LGP construct probability-scale uncertainty differently,
+these variance maps should be interpreted as model-specific uncertainty summaries rather than as directly comparable frequentist coverage measures.
+The empirical coverage behavior of the fitted interval procedures is examined separately in Appendix~\ref{app:coverage}.
 
-\subsubsection{Predictive performance on test data} 
+\subsubsection{Predictive Performance on the Test Data} 
 
-Finally, we evaluate predictive accuracy using predictions from the fitted BKP and LGP models on the withheld testing set, with performance measured by the Brier score.
+We next evaluate the fitted probabilities at the randomly withheld testing locations using the Brier score.
 
 \begin{CodeChunk}
 \begin{CodeInput}    
 R> all_preds <- list()
 R> all_preds$BKP <- predict(bkp_fit, Xnew = X_test)$mean
 R> all_preds$LGP <- gp_pred(gp, X_test, transform = TRUE)$mean
-R>
 R> # Calculate the empirical success rate for the test data
 R> pi_test <- y_test / m_test 
-R>
 R> # Calculate the Mean Squared Error (Brier Score)
 R> mse_bkp <- mean((all_preds$BKP - pi_test)^2)
 R> mse_gp <- mean((all_preds$LGP - pi_test)^2)   
 \end{CodeInput}
 \end{CodeChunk} 
 
-The results indicate that the BKP model achieves a lower Brier score (0.0073) compared to the LGP model (0.0188), demonstrating its superior predictive accuracy. This shows that the BKP probabilistic forecasts are closer to the observed \emph{Loa loa} infection rates, and its predictions are therefore more reliable. Furthermore, the BKP model is computationally more efficient, requiring only 0.05 seconds for model fitting and hyperparameter tuning, compared to 0.14 seconds for the LGP model.
+For this random train--test split, the BKP model achieves a Brier score of 0.0073, compared with 0.0188 for the LGP model.
+The lower score indicates that the BKP predictions agree more closely, on average, with the observed infection proportions at the withheld locations.
+Together with the spatial patterns in Figure~\ref{fig:Loaloa_combined}, these results show that BKP provides an accurate and spatially coherent fit for this \emph{Loa loa} prevalence-mapping application.
 
 \subsection{Mourning Warbler distribution modeling}\label{sec:warbler}
 
-To further demonstrate the applicability and scalability of the \pkg{BKP} package in complex ecological studies, we consider a species distribution modeling (SDM) task for the Mourning Warbler in North America. This example compares BKP, TwinBKP, and LGP models in terms of predictive accuracy, uncertainty quantification, and computational efficiency in a higher-dimensional covariate space.
+We next illustrate the use of BKP and TwinBKP for species distribution modeling using presence--absence observations of the Mourning Warbler in North America.
+Unlike the preceding application, the models are fitted in an eight-dimensional environmental covariate space rather than directly in geographic coordinates.
+The example compares BKP, TwinBKP, and LGP using a predefined spatially structured test set and subsequently projects the fitted environmental relationships back into geographic space.
 
 \subsubsection{Data Preparation} 
 
-The biological data originates from the 2011 North American Breeding Bird Survey (BBS) \citep{sauer2014north}, utilizing a compiled subset provided by \citet{harris2015generating} and subsequently analyzed by \citet{golding2016fast}. The assembled dataset for our analysis consists of three primary components: geographic coordinates (longitude and latitude), the binary response variable $y$ indicating the presence (1) or absence (0) of the Mourning Warbler, and the associated environmental covariates.
-Following \citet{golding2016fast}, geographic coordinates are strictly excluded from the predictive modeling phase. Because standard SDM practice dictates that species distributions are driven by environmental conditions rather than mere spatial positioning, the models are conditioned on eight continuous bioclimatic variables from \citet{harris2015generating}. 
-Moreover, a disc-based spatial stratification procedure is employed \citep{golding2016fast} to divide the data into 1613 training and 301 testing points. This approach deliberately isolates continuous geographic blocks. The complete geographic layout of this partitioned data is visualized in the distribution map (Figure~\ref{fig:warbler_dist}).  
+The occurrence data are derived from the 2011 North American Breeding Bird Survey (BBS) \citep{sauer2014north}, using a compiled subset provided by \citet{harris2015generating} and subsequently analyzed by \citet{golding2016fast}.
+The dataset contains geographic coordinates, a binary response $y$ indicating presence ($y=1$) or absence ($y=0$), and eight continuous bioclimatic covariates.
+
+Following \citet{golding2016fast}, longitude and latitude are used only to define the spatial partition and visualize the results; they are not included as model predictors.
+Instead, all three models use the same eight bioclimatic variables.
+The predefined disc-based spatial partition contains 1,613 training observations and 301 testing observations, with the testing observations forming geographically contiguous withheld regions.
+This partition provides a more demanding assessment of spatial transfer than a conventional random train--test split.
 
 \begin{CodeChunk}
 \begin{CodeInput}   
@@ -1451,14 +1471,12 @@ R> data <- read.csv("code/data/Mourning_Warbler.csv", stringsAsFactors = FALSE)
 R> train_idx <- which(data$split == "training")
 R> test_idx  <- which(data$split == "testing")
 R> bio_cols <- grep("^wc2", names(data), value = TRUE)
-R>
 R> # Extract 8 bioclimatic covariates
 R> X_all <- as.matrix(data[, bio_cols])
 R> X_train <- X_all[train_idx, ]; y_train <- data$y[train_idx]
 R> m_train <- rep(1L, length(y_train))
 R> X_test  <- X_all[test_idx, ];  y_test  <- data$y[test_idx]
 R> Xbounds <- t(apply(X_train, 2, range))
-R>
 R> # Load and crop the environmental raster for spatial projection
 R> library(terra)
 R> tif_files <- file.path("code/data/climate/wc2.1_10m", paste0(bio_cols, ".tif"))
@@ -1468,14 +1486,24 @@ R> names(na_clim) <- bio_cols
 \end{CodeChunk}
 
 \begin{figure}[!t]
-    \centering 
-    \includegraphics[width=0.8\linewidth]{mourning_warbler_map_distribution.pdf} 
-    \caption{Spatial distribution of the raw data for the Mourning Warbler. Dark purple points indicate training presences, light purple points denote training absences, and white points represent the withheld testing points that were excluded from the model fitting process by the disc-based spatial stratification.}
-    \label{fig:warbler_dist}
+	\centering 
+	\includegraphics[width=0.8\linewidth]{mourning_warbler_map_distribution.pdf} 
+	\caption{Spatial distribution of the Mourning Warbler observations.
+	Dark purple points indicate training presences, light purple points indicate training absences, and white points indicate the testing observations withheld under the disc-based spatial partition.}
+	\label{fig:warbler_dist}
 \end{figure}
-\subsubsection{Model Fitting and Evaluation}
 
-We fit the standard BKP model using the \fct{fit\_BKP} function with a fixed prior ($r_0 = 0.1$), the log-loss criterion, and an isotropic Gaussian kernel. Additionally, we use \fct{fit\_TwinBKP} with a local Wendland kernel. For benchmarking, an LGP model is fitted using the \pkg{gplite} package.
+Figure~\ref{fig:warbler_dist} shows the spatial distribution of the training and testing observations.
+The withheld observations occur in geographically contiguous regions created by the disc-based partition, rather than being randomly interspersed among the training locations.
+
+\subsubsection{Model Fitting and Predictive Evaluation}
+
+We fit the full BKP model using \fct{fit\_BKP} with a fixed prior precision $r_0=0.1$, the log-loss criterion, and an isotropic Gaussian kernel.
+Because \code{p0} is not supplied, the prior mean is set to the empirical presence proportion in the training data.
+We then fit TwinBKP using the same global kernel and prior specification, together with the default compactly supported Wendland kernel for the local update.
+For comparison, an LGP model with a Bernoulli likelihood and squared-exponential covariance function is fitted using the \pkg{gplite} package.
+
+The elapsed times reported below include model fitting, hyperparameter optimization, and probability prediction at the 301 testing locations.
 
 \begin{CodeChunk}
 \begin{CodeInput}
@@ -1493,50 +1521,68 @@ R> twin_fit <- fit_TwinBKP(X_train, y_train, m_train, Xbounds = Xbounds,
 R> twin_pred <- predict(twin_fit, Xnew = X_test)
 R>
 R> # 3. Fit LGP (via gplite)
-R> library(gplite)
 R> gp <- gp_init(cf = cf_sexp(), lik = lik_bernoulli())
 R> gp <- gp_optim(gp, X_train, y_train, verbose = FALSE)
 R> gp_pred <- gp_pred(gp, X_test, transform = TRUE)
 \end{CodeInput}
 \end{CodeChunk}
 
-Figure~\ref{fig:warbler_roc} displays the ROC curves for the evaluated methods, while Table~\ref{tab:model_comparison} provides a quantitative summary of the predictive performance and computational efficiency. 
-The predictive performance on the testing set is evaluated using AUC and the Brier score. Both \fct{fit\_BKP} and \fct{fit\_TwinBKP} achieve superior classification accuracy compared to the LGP model. Specifically, the TwinBKP model achieves the highest AUC of 0.912 and the lowest Brier score of 0.0669, closely followed by the standard BKP model (AUC = 0.888, Brier score = 0.0691). Both BKP-based methods consistently outperform the LGP model, which yields an AUC of 0.852 and a Brier score of 0.0798. 
-Furthermore, the BKP framework demonstrates exceptional scalability in the 8-dimensional covariate space. As detailed in Table~\ref{tab:model_comparison}, the standard BKP and TwinBKP models converge in just 6.51 and 0.04 seconds, respectively, compared to the substantial 522.80-second computational overhead incurred by the LGP model.
- 
 \begin{table}[!t]
-  \centering
-  \caption{Comparison of Mourning Warbler Models}
-  \label{tab:model_comparison}
-  \begin{tabular}{lccc}
-    \toprule
-    Model & AUC & Brier Score & Time (s) \\
-    \midrule
-    BKP     & 0.888 & 0.069057 & 6.51 \\
-    TwinBKP & 0.912 & 0.066881 & 0.04 \\
-    LGP     & 0.852 & 0.079835 & 522.80 \\
-    \bottomrule
-  \end{tabular}
+	\centering
+	\begin{tabular}{lccc}
+		\toprule
+		Model & AUC & Brier score & Elapsed time (s) \\
+		\midrule
+		BKP     & 0.888 & 0.0691 & 6.51 \\
+		TwinBKP & 0.912 & 0.0669 & 0.04 \\
+		LGP     & 0.852 & 0.0798 & 522.80 \\
+		\bottomrule
+	\end{tabular}
+	\caption{Predictive performance and elapsed computation time for the Mourning Warbler application.
+	AUC and Brier scores are evaluated on the predefined spatial test set containing 301 observations.
+	Elapsed time includes model fitting, hyperparameter optimization, and prediction at the testing locations and is reported for a single replication run on the hardware described in the computational details.}
+	\label{tab:model_comparison}
 \end{table}
 
+Predictive performance on the spatially withheld testing set is summarized using the area under the AUC and the Brier score.
+Table~\ref{tab:model_comparison} reports the predictive performance and elapsed computation times for the three fitted models.
+
+On this predefined spatial test set, TwinBKP achieves the highest AUC of 0.912 and the lowest Brier score of 0.0669.
+The full BKP model obtains an AUC of 0.888 and a Brier score of 0.0691, while the corresponding LGP values are 0.852 and 0.0798.
+Thus, both BKP-based fits provide better discrimination and smaller probability errors than the fitted LGP model in this application.
+
+TwinBKP also has the shortest observed elapsed time at 0.04 seconds, compared with 6.51 seconds for full BKP and 522.80 seconds for LGP.
+These results illustrate the computational benefit of replacing full-data kernel aggregation with the twinning-based global-local approximation in this eight-dimensional example.
+
+\subsubsection{Spatial Projection}
+
+
+To visualize the fitted environmental relationships geographically, each model is evaluated at raster cells having complete values for all eight bioclimatic covariates.
+The resulting occurrence probabilities and variance summaries are then mapped to the corresponding geographic locations.
+Because longitude and latitude are not model predictors, these maps represent geographic projections of relationships learned in environmental covariate space rather than direct spatial smoothing of the occurrence data.
+
+Figure~\ref{fig:warbler_maps_combined} compares the projected probability and variance surfaces.
+The probability panels use a common scale from 0 to 1, whereas the variance panels use model-specific scales.
+
 \begin{figure}[!t]
-    \centering 
-    \includegraphics[width=0.6\linewidth]{mourning_warbler_roc_comparison.pdf}  
-    \caption{ROC curves comparing the classification performance of the BKP, TwinBKP, and LGP models on the Mourning Warbler test dataset. The AUC values summarize the overall discriminatory capacity of each method.}
-    \label{fig:warbler_roc}
+	\centering
+	\includegraphics[width=\linewidth]{mourning_warbler_map_combined.pdf}
+	\caption{Spatial projections from the BKP, TwinBKP, and LGP models for the Mourning Warbler.
+	The left column shows predicted probabilities of presence on a common scale from 0 to 1.
+	The right column shows model-specific posterior variance summaries, with separate color scales for the three models.
+	The top, middle, and bottom rows correspond to BKP, TwinBKP, and LGP, respectively.}
+	\label{fig:warbler_maps_combined}
 \end{figure}
 
-To interpret the ecological implications of these models, we project the environmental predictions back into geographic space. 
-The continuous probabilistic predictions and the associated uncertainties are evaluated across the entire bioclimatic raster. Figure~\ref{fig:warbler_maps_combined} presents a comprehensive grid comparison of the predictive landscapes generated by the three models.
+All three models produce geographically structured occurrence-probability surfaces and identify broadly overlapping regions of elevated predicted presence.
+The fitted maps nevertheless differ in the spatial extent and fine-scale variation of these regions, reflecting differences between the full probability-scale kernel update, the TwinBKP global-local approximation, and the latent-GP construction.
 
-\begin{figure}[!t]
-    \centering 
-    \includegraphics[width=\linewidth]{mourning_warbler_map_combined.pdf} 
-    \caption{Spatial prediction summaries generated by the evaluated models for the Mourning Warbler. The left column displays the predicted probability of presence, and the right column illustrates the associated posterior variance surfaces. The top, middle, and bottom rows correspond to the BKP, TwinBKP, and LGP models, respectively.}
-    \label{fig:warbler_maps_combined}
-\end{figure}
+The variance maps also show substantial spatial heterogeneity within each fitted model.
+Because the three methods use different posterior constructions and the variance panels have model-specific scales, these surfaces are most appropriately interpreted as within-model uncertainty summaries rather than as a direct ranking of uncertainty calibration across methods.
+Predictions for raster cells containing environmental combinations that are weakly represented by the training data should additionally be interpreted as covariate-space extrapolations.
 
-These spatial maps confirm that all three frameworks effectively translate high-dimensional environmental covariate relationships into coherent geographical predictions. Notably, the models produce probability surfaces that accurately identify the core habitat regions of the Mourning Warbler, while their corresponding variance maps provide an interpretable measure of uncertainty, particularly in unsampled or sparsely sampled geographic areas.
+
+\FloatBarrier
 
 \section{Summary and discussion} \label{sec:summary}
 
@@ -1563,23 +1609,7 @@ Finally, we welcome contributions from the community and invite developers to pa
 %% -- Optional special unnumbered sections -------------------------------------
 
 \section*{Computational details}
-
-All analyses were carried out using \proglang{R} version 4.6.1.
-The main package analyzed in this article was \pkg{BKP} version 0.3.0.
-The examples and comparisons used several auxiliary packages, including
-\pkg{tgp}, \pkg{gplite}, \pkg{kernlab}, \pkg{mlbench}, \pkg{pROC},
-\pkg{RiskMap}, \pkg{ggplot2}, \pkg{sf}, \pkg{terra},
-\pkg{rnaturalearth}, and \pkg{rnaturalearthdata}.
-\proglang{R} itself and all packages used are available from the Comprehensive \proglang{R} Archive Network (CRAN) at \url{https://CRAN.R-project.org/}.
-The TwinBKP and TwinDKP implementations use the header-only
-\pkg{nanoflann} library for kd-tree nearest-neighbour search and adapt the
-twinning subset-selection code from the \pkg{twingp} package; copyright and
-license information for these third-party components is provided in
-\code{inst/COPYRIGHTS} of the \pkg{BKP} package.
-The multi-start length-scale tuning strategy follows the log-scale
-parameterization and search-region design used in \pkg{GPfit}.
-The timing experiments in Section~4.1 were conducted on a workstation equipped
-with an Intel(R) Xeon(R) W-2235 CPU at 3.80GHz and 16 GB RAM.
+All analyses were conducted using \proglang{R} version 4.6.1 and \pkg{BKP} version 0.3.0. The LGP comparisons were implemented using \pkg{gplite} version 0.13.0 and \pkg{kernlab} version 0.9-33, while the Two Spirals benchmark and the \code{loaloa} dataset were obtained from \pkg{mlbench} version 2.1-8 and \pkg{RiskMap} version 1.0.0, respectively. \proglang{R} and the \proglang{R} packages used in this article are available from the Comprehensive \proglang{R} Archive Network (CRAN) at \url{https://CRAN.R-project.org/}. The TwinBKP and TwinDKP implementations use the header-only \code{nanoflann} library for kd-tree nearest-neighbour search and adapt the twinning subset-selection code from the \pkg{twingp} package. Copyright and license information for these third-party components is provided in \code{inst/COPYRIGHTS} of the \pkg{BKP} package. The multi-start length-scale tuning procedure follows the log-scale parameterization and search-region construction used in \pkg{GPfit}. All timing results reported in Figure~\ref{fig:elapsed_time} and Table~\ref{tab:model_comparison} were obtained on a workstation equipped with an Intel(R) Xeon(R) W-2235 CPU at 3.80GHz and 16 GB RAM. The computation times in Figure~\ref{fig:elapsed_time} are averages over 20 independent repetitions, whereas the elapsed times in Table~\ref{tab:model_comparison} are from a single replication run.
 
 
 
@@ -1621,7 +1651,7 @@ Figure~\ref{fig:ex2_combined} visualizes the estimated probability surfaces and 
 
 \begin{figure}[!t]
     \centering 
-    \includegraphics[width=0.9\linewidth]{ex2_combined.pdf}  
+    \includegraphics[width=0.8\linewidth]{ex2_combined.pdf}  
     \caption{Visualization of predictive means and 95\% credible intervals based on a single simulation run over the 2,000 grid points for Example~2. The rows represent standard BKP, ESS-calibrated BKP-ESS, and LGP, respectively. The left column shows the results for $n=30$ and the right column for $n=100$.}
     \label{fig:ex2_combined}
 \end{figure}
