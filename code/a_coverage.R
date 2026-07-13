@@ -8,7 +8,7 @@ library(gplite)
 library(tgp)
 
 # ======================== Tunable parameters ===========================
-n_reps   <- 2000
+n_reps   <- 100
 ngrid    <- 2000
 CI_level <- 0.95
 alpha_ci <- (1 - CI_level) / 2
@@ -189,7 +189,7 @@ for (mi in seq_along(plot_methods)) {
 
     plot(Xgrid, mean, type = "n",
          xlab = "x", ylab = "Probability",
-         main = sprintf("%s %s, N=%d", sub_labels[sub_idx], method, ntr),
+         main = sprintf("%s %s, n=%d", sub_labels[sub_idx], method, ntr),
          ylim = ylim)
     polygon(c(Xgrid, rev(Xgrid)), c(lower, rev(upper)),
             col = "lightgrey", border = NA)
