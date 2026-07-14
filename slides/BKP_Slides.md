@@ -3,11 +3,11 @@ title: "BKP: An R Package for Beta Kernel Process Modeling"
 shorttitle: "BKP"
 # date: "2026.04.11"
 header-includes:
-  \AtBeginDocument{\author[Jiangyan Zhao (ECNU)]{Jiangyan Zhao}}
-    \AtBeginDocument{\date[2026.07.24 (Kunming)]{2026.07.24}}
-    \renewcommand*{\bibfont}{\footnotesize}
-  \usepackage{graphicx}
-  \graphicspath{{../code/figure/}{code/figure/}}
+  - \AtBeginDocument{\author[Jiangyan Zhao (ECNU)]{Jiangyan Zhao}}
+  - \AtBeginDocument{\date[2026.07.24 (Kunming)]{2026.07.24}}
+  - \renewcommand*{\bibfont}{\footnotesize}
+  - \usepackage{graphicx}
+  - \graphicspath{{../code/figure/}}
 institute: 
   - School of Statistics, ECNU
   - jyzhao@sfs.ecnu.edu.cn
@@ -47,7 +47,7 @@ classoption: "aspectratio=169"
   
   - Longitudinal patient-reported outcomes \citep{Najera2018HRQoL, Najera2019PRO}
   
-  - Infectious disease risk prediction \citep{Diggle2007}
+  - Infectious disease risk prediction \citep{Diggle2007Loa}
   
   - ...
 
@@ -59,7 +59,7 @@ classoption: "aspectratio=169"
 
 ### Beta Kernel Process
 
-- **Beta Kernel Process (BKP)**: a scalable and interpretable nonparametric model for binomial probability surfaces \citep{Goetschalckx:2011, MacKenzie2014, Rolland2018BKP}
+- **Beta Kernel Process (BKP)**: a scalable and interpretable nonparametric model for binomial probability surfaces \citep{Goetschalckx:2011, MacKenzie2014, Rolland2019BKP}
 
 - **Key features**:
   - \textcolor{red}{Computational efficiency}: closed-form posterior inference 
