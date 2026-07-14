@@ -1,0 +1,220 @@
+
+%------------------------- preamble.tex begin ------------------------------------------------------------
+\usepackage{ecnu}
+% \usepackage{ctex} %导入 ctex 宏包，添加中文支持
+\usepackage{amsmath, amsfonts, amssymb, bm}   %导入数学公式所需宏包
+\usefonttheme[onlymath]{serif} %数学字体为 serif 风格
+\usepackage{xcolor} %字体颜色支持
+\usepackage{graphicx, url}
+\usepackage{natbib} % 参考文献
+\renewcommand{\refname}{References}
+\usepackage{tikz} % 绘图
+\usetikzlibrary{fadings}
+\usepackage{colortbl} %彩色表格需要使用 colortbl 宏包提供的一些命令：\columncolor、\rowcolor、\cellcolor 等
+\usepackage{booktabs} %三线表
+\usepackage{dsfont}
+\usepackage{pifont}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{subfig}
+\usepackage{fontawesome5}
+%%%%%%%%%%%%%%%%%%	
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% 提纲定制 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\definecolor{orange-red}{rgb}{0.7137, 0.04314, 0.1765}
+%\setbeamertemplate{section in toc}[circle]
+%\setbeamerfont{section number projected}{size=\small}
+%\setbeamercolor{section number projected}{bg=orange-red,fg=white}
+
+% -------------- Section style -----------------------
+\setbeamertemplate{section in toc}{%
+  \leavevmode\leftskip=2ex%
+  \llap{%
+    \usebeamerfont*{section number projected}%
+    \usebeamercolor{section number projected}%
+    \begin{pgfpicture}{-1ex}{0ex}{1ex}{2ex}
+      \color{bg}
+      \pgfpathcircle{\pgfpoint{0pt}{.75ex}}{1.7ex}
+      \pgfusepath{fill}
+      \pgftext[base]{\color{fg}\inserttocsectionnumber}
+    \end{pgfpicture}\kern2ex
+  }%
+  \inserttocsection\par}
+
+\setbeamertemplate{subsection in toc}{%
+  \leavevmode\leftskip=2em%
+  \llap{%
+    \usebeamercolor{section number projected}%
+    \begin{pgfpicture}{-1ex}{0ex}{1ex}{2ex}
+      \color{bg}
+      \pgfpathcircle{\pgfpoint{0pt}{.75ex}}{0.4ex} 
+      \pgfusepath{fill}
+    \end{pgfpicture}%
+    \kern0.5ex%
+  }%
+  \inserttocsubsection\par%
+}
+
+\usepackage{multicol}  % 确保加载了 multicols
+
+\AtBeginSection[]{ 
+  \begin{frame}{Contents} 
+    %\begin{multicols}{2} % 两栏
+      \tableofcontents[currentsection,hideallsubsections]
+    %\end{multicols}
+  \end{frame} 
+} 
+
+\AtBeginSubsection[]{ 
+  \begin{frame}{Contents} 
+    %\begin{multicols}{2} % 两栏
+      \tableofcontents[
+        sections={\insertsectionnumber}, %只显示当前节
+        sectionstyle=show/hide,
+        subsectionstyle=show/shaded/hide
+      ]
+      %\tableofcontents[sectionstyle=show/shaded,subsectionstyle=show/shaded/hide]
+    %\end{multicols}
+  \end{frame} 
+}
+
+
+
+%--------------------------------------------------------------------------
+\beamertemplateballitem		%设置 Beamer 主题
+\setbeamertemplate{caption}[numbered]  %图片和表格编号
+\setbeamertemplate{theorems}[numbered] %定理类环境编号，默认编号为 section 统一
+
+%===================  定理类环境定义 ===================
+\usepackage{amsthm}
+\newtheorem{assumption}{Assumption}[section]
+
+
+
+%%%%------------------------%%%%%
+%\catcode`\。=\active         %或者=13
+%\newcommand{。}{．}				
+%将正文中的“。”号转换为“.”。
+%%%%%%%%%%%%%%%%%%%%%
+
+
+%--------------------------------------- Regular font in math equation --------------------------------
+\renewcommand{\vec}[1]{\mbox{\boldmath ${#1}$}}
+% \AtBeginDocument{
+%   \renewcommand{\vec}[1]{\mathbfit{#1}} % markdown 下采用的是unicode-math
+% }
+\def\va{\vec{a}}	\def\vA{\vec{A}}	\def\bA{\mathbb{A}}	\def\calA{\mathcal{A}}
+\def\vb{\vec{b}}	\def\vB{\vec{B}}	\def\bB{\mathbb{B}}	\def\calB{\mathcal{B}}
+\def\vc{\vec{c}}	\def\vC{\vec{C}}	\def\bC{\mathbb{C}}	\def\calC{\mathcal{C}}
+\def\vd{\vec{d}}	\def\vD{\vec{D}}	\def\bD{\mathbb{D}}	\def\calD{\mathcal{D}}
+\def\ve{\vec{e}}	\def\vE{\vec{E}}	\def\bE{\mathbb{E}}	\def\calE{\mathcal{E}}
+\def\vf{\vec{f}}	\def\vF{\vec{F}}	\def\bF{\mathbb{F}}	\def\calF{\mathcal{F}}
+\def\vg{\vec{g}}	\def\vG{\vec{G}}	\def\bG{\mathbb{G}}	\def\calG{\mathcal{G}}
+\def\vh{\vec{h}}	\def\vH{\vec{H}}	\def\bH{\mathbb{H}}	\def\calH{\mathcal{H}}
+\def\vi{\vec{i}}	\def\vI{\vec{I}}	\def\bI{\mathbb{I}}	\def\calI{\mathcal{I}}
+\def\vj{\vec{j}}	\def\vJ{\vec{J}}	\def\bJ{\mathbb{J}}	\def\calJ{\mathcal{J}}
+\def\vk{\vec{k}}	\def\vK{\vec{K}}	\def\bK{\mathbb{K}}	\def\calK{\mathcal{K}}
+\def\vl{\vec{l}}	\def\vL{\vec{L}}	\def\bL{\mathbb{L}}	\def\calL{\mathcal{L}}
+\def\vm{\vec{m}}	\def\vM{\vec{M}}	\def\bM{\mathbb{M}}	\def\calM{\mathcal{M}}
+\def\vn{\vec{n}}	\def\vN{\vec{N}}	\def\bN{\mathbb{N}}	\def\calN{\mathcal{N}}
+\def\vo{\vec{o}}	\def\vO{\vec{O}}	\def\bO{\mathbb{O}}	\def\calO{\mathcal{O}}
+\def\vp{\vec{p}}	\def\vP{\vec{P}}	\def\bP{\mathbb{P}}	\def\calP{\mathcal{P}}
+\def\vq{\vec{q}}	\def\vQ{\vec{Q}}	\def\bQ{\mathbb{Q}}	\def\calQ{\mathcal{Q}}
+\def\vr{\vec{r}}	\def\vR{\vec{R}}	\def\bR{\mathbb{R}}	\def\calR{\mathcal{R}}
+\def\vs{\vec{s}}	\def\vS{\vec{S}}	\def\bS{\mathbb{S}}	\def\calS{\mathcal{S}}
+\def\vt{\vec{t}}	\def\vT{\vec{T}}	\def\bT{\mathbb{T}}	\def\calT{\mathcal{T}}
+\def\vu{\vec{u}}	\def\vU{\vec{U}}	\def\bU{\mathbb{U}}	\def\calU{\mathcal{U}}
+\def\vv{\vec{v}}	\def\vV{\vec{V}}	\def\bV{\mathbb{V}}	\def\calV{\mathcal{V}}
+\def\vw{\vec{w}}	\def\vW{\vec{W}}	\def\bW{\mathbb{W}}	\def\calW{\mathcal{W}}
+\def\vx{\vec{x}}	\def\vX{\vec{X}}	\def\bX{\mathbb{X}}	\def\calX{\mathcal{X}}
+\def\vy{\vec{y}}	\def\vY{\vec{Y}}	\def\bY{\mathbb{Y}}	\def\calY{\mathcal{Y}}
+\def\vz{\vec{z}}	\def\vZ{\vec{Z}}	\def\bZ{\mathbb{Z}}	\def\calZ{\mathcal{Z}}
+
+\def\valpha{\vec{\alpha}}
+\def\vbeta{\vec{\beta}}
+\def\vtheta{\vec{\theta}}	\def\vTheta{\vec{\Theta}}
+\def\vdelta{\vec{\delta}}	\def\vDelta{\vec{\Delta}}
+\def\vsigma{\vec{\sigma}}	\def\vSigma{\vec{\Sigma}}
+\def\vrho{\vec{\rho}}
+\def\vgamma{\vec{\gamma}}
+\def\vomega{\vec{\omega}}
+\def\vmu{\vec{\mu}}
+\def\vlambda{\vec{\lambda}}  \def\vLambda{\vec{\Lambda}}  
+\def\vepsilon{\vec{\varepsilon}}
+
+\def\vPsi{\vec{\Psi}}
+\def\vnu{\vec{\nu}}
+\def\vell{\vec{\ell}}
+
+
+\newcommand{\0}{\mathbf{0}}
+\newcommand{\1}{\mathbf{1}}
+\newcommand{\erl}{\left(-\infty , +\infty\right]} %Extended real line
+
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\act}[1]{\left\langle {#1} \right\rangle}
+\newcommand{\seq}[2]{\left\{{#1}_{{#2}}\right\}_{{#2} \in \mathbb{N}}}
+\newcommand{\Seq}[2]{\left\{{#1}^{{#2}}\right\}_{{#2} \in \mathbb{N}}}
+
+\renewcommand{\hat}{\widehat}
+\renewcommand{\tilde}{\widetilde}
+\renewcommand{\bar}{\overline}
+
+\def\prob {{\rm Pr}}
+\def\var{\mbox{\rm Var}}
+\def\Cov{\mbox{\rm Cov}}
+\def\Corr{\mbox{\rm Corr}}
+\def\diag{\mbox{\rm diag}}
+\def\logit{\mbox{\rm logit}}
+\def\argmin{\mbox{\rm argmin}}
+\def\argmax{\mbox{\rm argmax}}
+\def\sgn{\mbox{\rm sgn}}
+\def\d{\rm d}
+%----------------------------------------------------------------------------------------------------
+
+%-------------------------------------- Algorithm ---------------------------------
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+\algnewcommand\algorithmicassume{\textbf{Assume:}}
+\algnewcommand\Assume{\item[\algorithmicassume]}
+\algnewcommand{\LineComment}[1]{\State \(\triangleright\) #1}
+%----------------------------------------------------------------------------------
+
+
+%%--------------------------- JSS ---------------------------------------------
+\makeatletter
+\newcommand\code{\bgroup\@makeother\_\@makeother\~\@makeother\$\@codex}
+\def\@codex#1{{\normalfont\ttfamily\hyphenchar\font=-1 #1}\egroup}
+%%\let\code=\texttt
+\let\proglang=\textsf
+\newcommand{\pkg}[1]{{\fontseries{m}\fontseries{b}\selectfont #1}}
+\newcommand{\class}[1]{`\code{#1}'}
+\newcommand{\fct}[1]{\code{#1()}}
+\makeatother
+%------------------------------------------------------------------------------
+
+
+%----- https://bookdown.org/yihui/rmarkdown-cookbook/multi-column.html ------
+\newenvironment{cols}[1][]{}{}
+
+\newenvironment{col}[1]{\begin{minipage}{#1}\ignorespaces}{%
+\end{minipage}
+\ifhmode\unskip\fi
+\aftergroup\useignorespacesandallpars}
+
+\def\useignorespacesandallpars#1\ignorespaces\fi{%
+#1\fi\ignorespacesandallpars}
+
+\makeatletter
+\def\ignorespacesandallpars{%
+  \@ifnextchar\par
+    {\expandafter\ignorespacesandallpars\@gobble}%
+    {}%
+}
+\makeatother
+
+
+%------------------------- preamble.tex end ------------------------------------------------------------
