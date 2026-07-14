@@ -31,20 +31,7 @@ classoption: "aspectratio=169"
 # linkcolor: red      # 设置内部跳转链接颜色（如目录）
 ---
 
-```{r setup, include=FALSE}
-library(kableExtra)
 
-## Use the directory containing BKP_Slides.Rmd as the working directory
-## for all R code chunks.
-slides_dir <- dirname(
-  normalizePath(
-    knitr::current_input(dir = TRUE),
-    winslash = "/"
-  )
-)
-
-knitr::opts_knit$set(root.dir = slides_dir)
-```
 
 # Background
 
@@ -120,6 +107,5 @@ knitr::opts_knit$set(root.dir = slides_dir)
 
 ---
 
-```{r, echo=FALSE, fig.align='center', out.width='60%'}
-knitr::include_graphics("Thanks.png")
-```
+
+\begin{center}\includegraphics[width=0.6\linewidth]{Thanks} \end{center}
