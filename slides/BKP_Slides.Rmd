@@ -46,42 +46,218 @@ slides_dir <- dirname(
 knitr::opts_knit$set(root.dir = slides_dir)
 ```
 
-# Background
+# Motivation
 
-- Estimating a **continuous probability function** from **binary** or **binomial observations** is fundamental in statistics and machine learning.
 
-- Applications include:
+### Estimating an Unknown Probability Surface
 
-  - Binary classification \citep{MacKenzie2014, Wen2025KLR}
-  
-  - Probability calibration \citep{Sung2020binaryCalibration, Dimitriadis2023}
-  
-  - Relative abundance modeling \citep{Martin2020}
-  
-  - Longitudinal patient-reported outcomes \citep{Najera2018HRQoL, Najera2019PRO}
-  
-  - Infectious disease risk prediction \citep{Diggle2007Loa}
-  
-  - ...
+\begin{columns}[c,onlytextwidth]
 
-### Classical methods & Challenges
+\begin{column}{0.55\textwidth}
+\centering
+\includegraphics[width=\linewidth]{ex2.pdf}
+\end{column}
 
-- **Parametric method**: logistic regression is \textcolor{red}{computationally efficient} but \textcolor{blue}{limited in capturing complex nonlinear patterns}.
+\begin{column}{0.5\textwidth}
+\begin{itemize}
+\item \textbf{Observation model}
+\[
+  y_i \mid \pi(\vx_i) \sim \operatorname{Binomial} \!\left(m_i,\pi(\vx_i)\right).
+\]
 
-- **Nonparametric method**: Gaussian Process (GP) offers \textcolor{red}{flexibility and principled uncertainty quantification}, but \textcolor{blue}{approximate inference} for binary (*non-Gaussian*) likelihood increases computational cost.
 
-### Beta Kernel Process
+\item \textbf{Objective}
 
-- **Beta Kernel Process (BKP)**: a scalable and interpretable nonparametric model for binomial probability surfaces \citep{Goetschalckx:2011, MacKenzie2014, Rolland2019BKP}
+Estimate the underlying probability surface \(\pi(\vx)\) and quantify its pointwise uncertainty.
+\end{itemize}
 
-- **Key features**:
-  - \textcolor{red}{Computational efficiency}: closed-form posterior inference 
-  
-  - \textcolor{red}{More transparency and straightforward}: beta-binomial conjugate pair
-  
-  - \textcolor{red}{Uncertainty quantification}: adaptive decision-marking
-  
-- **Dirichlet Kernel Process (DKP)**: a natural extension for categorical or multinomial data
+\end{column}
+
+\end{columns}
+
+
+### Existing Approaches and the Remaining Gap
+
+\begin{columns}[c,onlytextwidth]
+
+\begin{column}{0.46\textwidth}
+
+\begin{block}{Logistic regression}
+
+\[
+  \pi(\vx) = \operatorname{logit}^{-1} \!\left(\vx^\top\boldsymbol{\beta}\right)
+\]
+
+\begin{center}
+\textcolor{red}{Fast and interpretable}
+\end{center}
+
+\begin{center}
+\textcolor{blue}{Limited nonlinear flexibility}
+\end{center}
+
+\end{block}
+
+\end{column}
+
+\hfill
+
+\begin{column}{0.46\textwidth}
+
+\begin{block}{Gaussian process classification}
+
+\[
+  \pi(\vx)=\operatorname{logit}^{-1}\{f(\vx)\}, \quad f(\vx)\sim\operatorname{GP}
+\]
+
+\begin{center}
+\textcolor{red}{Flexible probability surfaces}
+\end{center}
+
+\begin{center}
+\textcolor{blue}{Approximate posterior inference}
+\end{center}
+
+\end{block}
+
+\end{column}
+
+\end{columns}
+
+\vspace{0.8em}
+
+\begin{alertblock}{Motivation}
+Can we retain nonlinear flexibility while performing direct, closed-form updating on the probability scale?
+\end{alertblock}
+
+# Methodology
+
+### Beta Kernel Process: Direct Probability-Scale Updating
+
+For each input location \(\vx\), combine a Beta prior with kernel-weighted binomial evidence.
+
+\begin{columns}[c,onlytextwidth]
+\hspace*{-0.02\textwidth}
+
+% --------------------------------------------------
+% Prior
+% --------------------------------------------------
+\begin{column}{0.28\textwidth}
+
+\begin{block}{1. Beta prior}
+\footnotesize
+\[
+  \pi(\vx) \sim \operatorname{Beta} \bigl\{\alpha_0(\vx),\beta_0(\vx) \bigr\}.
+\]
+
+\vspace{0.4em}
+
+\begin{center}
+Prior information on the probability scale
+\end{center}
+
+\end{block}
+
+\end{column}
+
+\begin{column}{0.05\textwidth}
+\centering
+\Large
+\[
++
+\]
+\end{column}
+
+% --------------------------------------------------
+% Local evidence
+% --------------------------------------------------
+\begin{column}{0.32\textwidth}
+
+\begin{block}{2. Local evidence}
+\footnotesize
+\[\begin{aligned}
+  k_i(\vx) &= k(\vx,\vx_i;\vtheta),\\[0.4em]
+  S(\vx) &= \textstyle\sum_{i=1}^{n} k_i(\vx)y_i,\\[0.4em]
+  F(\vx) &= \textstyle\sum_{i=1}^{n} k_i(\vx)(m_i-y_i).
+\end{aligned}\]
+
+\vspace{0.2em}
+
+\begin{center}
+  Nearby observations receive greater weight
+\end{center}
+
+\end{block}
+
+\end{column}
+
+\begin{column}{0.05\textwidth}
+\centering
+\Large
+\[
+\Rightarrow
+\]
+\end{column}
+
+% --------------------------------------------------
+% Posterior
+% --------------------------------------------------
+\begin{column}{0.33\textwidth}
+
+\begin{block}{3. Beta posterior}
+
+\footnotesize
+
+\[\begin{aligned}
+  \pi(\vx)\mid\calD &\sim \operatorname{Beta} \bigl\{\alpha_n(\vx),\beta_n(\vx)\bigr\},\\[0.4em]
+  \alpha_n(\vx) &= \alpha_0(\vx)+S(\vx),\\[0.4em]
+  \beta_n(\vx) &= \beta_0(\vx)+F(\vx).
+\end{aligned}\]
+
+\vspace{0.2em}
+
+\begin{center}
+Closed-form posterior inference
+\end{center}
+
+\end{block}
+
+\end{column}
+
+\end{columns}
+
+\vspace{0.5em}
+
+\begin{alertblock}{Key idea}
+\centering
+\textbf{Local kernel weighting}
+\quad \(+\) \quad
+\textbf{Beta--binomial conjugacy} \\
+\(\Longrightarrow\) \quad
+\textbf{flexible modeling with closed-form posterior inference}.
+\end{alertblock}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
