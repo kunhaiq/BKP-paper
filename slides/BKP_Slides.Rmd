@@ -467,72 +467,68 @@ Observations with \(h\geq 1\) receive exactly zero weight.
 
 ### LOOCV-Based Length-Scale Selection
 
-For each candidate \(\vtheta\), evaluate predictive performance by leave-one-out cross-validation.
-
-\vspace{0.4em}
-
-\begin{block}{Leave-one-out prediction}
-\small
-\[
-\widehat{\pi}^{-i}(\vx_i;\vtheta)
-\]
-
-denotes the predicted probability at \(\vx_i\) after excluding the \(i\)th observation.
-
-\begin{center}
-All leave-one-out predictions are computed from a single kernel matrix by setting its diagonal entries to zero.
-\end{center}
-\end{block}
-
-\vspace{0.3em}
-
 \begin{columns}[c,onlytextwidth]
 
-\begin{column}{0.46\textwidth}
+\begin{column}{0.55\textwidth}
 
-\begin{block}{Brier score}
-\footnotesize
-\[
-\mathrm{BS}(\vtheta)=\frac{1}{n}\sum_{i=1}^{n}
-\left\{\widehat{\pi}^{-i}(\vx_i;\vtheta)-\widetilde{\pi}_i\right\}^{2}
-\]
-
-\begin{center}
-Emphasizes squared probability-estimation error
-\end{center}
+\begin{block}{Leave-one-out quantities}
+\small
+\begin{itemize}
+\item \(\widehat{\pi}^{-i}(\vx_i;\vtheta)\): predicted probability at \(\vx_i\) after excluding observation \(i\).
+\item \(\widetilde{\pi}_i=y_i/m_i\): observed empirical proportion.
+\end{itemize}
 \end{block}
 
 \end{column}
 
 \hfill
 
-\begin{column}{0.49\textwidth}
+\begin{column}{0.41\textwidth}
 
-\begin{block}{Log-loss}
-\scriptsize
+\begin{alertblock}{Selection criterion}
+\small
 \[
-\mathrm{LL}(\vtheta)=-\frac{1}{n}\sum_{i=1}^{n}
-\left[
-\widetilde{\pi}_i\log\widehat{\pi}^{-i}(\vx_i;\vtheta)
-+(1-\widetilde{\pi}_i)\log\{1-\widehat{\pi}^{-i}(\vx_i;\vtheta)\}
-\right]
+\widehat{\vtheta}
+=
+\underset{\vtheta}{\argmin}\,
+L(\vtheta;\calD_n),
+\quad
+L\in\{\mathrm{BS},\mathrm{LL}\}.
 \]
-
-\begin{center}
-Penalizes overconfident probability errors more strongly
-\end{center}
-\end{block}
+\end{alertblock}
 
 \end{column}
 
 \end{columns}
 
-\vspace{0.3em}
+\vspace{0.15em}
 
-\begin{alertblock}{Objective}
-\centering
-Select the length-scale parameters that minimize the chosen LOOCV loss, where \(\widetilde{\pi}_i=y_i/m_i\).
-\end{alertblock}
+\begin{block}{Brier score}
+\small
+\[
+\mathrm{BS}(\vtheta)=\frac{1}{n}\sum_{i=1}^{n}
+\left\{\widehat{\pi}^{-i}(\vx_i;\vtheta)-\widetilde{\pi}_i\right\}^{2}.
+\]
+\end{block}
+
+\vspace{0.15em}
+
+\begin{block}{Log-loss}
+\small
+\[
+\mathrm{LL}(\vtheta)=-\frac{1}{n}\sum_{i=1}^{n}
+\left[
+\widetilde{\pi}_i\log\widehat{\pi}^{-i}(\vx_i;\vtheta)
++(1-\widetilde{\pi}_i)\log\{1-\widehat{\pi}^{-i}(\vx_i;\vtheta)\}
+\right].
+\]
+\end{block}
+
+\begin{center}
+\footnotesize
+All leave-one-out predictions are obtained from one kernel matrix by setting its diagonal entries to zero.
+\end{center}
+
 
 ### Multi-Start Hyperparameter Optimization
 
@@ -544,10 +540,9 @@ Select the length-scale parameters that minimize the chosen LOOCV loss, where \(
 \small
 \[
 \gamma_j=\log_{10}(\theta_j),
-\qquad
+\quad
 \theta_j=10^{\gamma_j}.
 \]
-
 \[
 d_\gamma=
 \begin{cases}
@@ -571,19 +566,16 @@ The transformation enforces positive length-scale parameters
 
 \begin{enumerate}
 
-\item Generate \(n_0=10d_\gamma\) initial values using a Latin hypercube design
+  \item Generate \(n_0=10d_\gamma\) initial values using a Latin hypercube design
 
-\item Run the derivative-free SBPLX algorithm from each initial value
+  \item Run the derivative-free SBPLX algorithm from each initial value
 
-\item Retain the solution with the smallest LOOCV loss
+  \item Retain the solution with the smallest LOOCV loss
 
-\end{enumerate}
-
+  \end{enumerate}
 \[
-\widehat{\vgamma}
-=
-\underset{\vgamma\in[-3,3]^{d_\gamma}}{\argmin}
-\;L(\vgamma;\calD)
+  s^\star= \underset{1\leq s\leq n_0}{\argmin}\; L\!\left(\widehat{\vgamma}^{(s)};\calD\right),
+\qquad \widehat{\vgamma} = \widehat{\vgamma}^{(s^\star)}.
 \]
 
 \end{block}
@@ -598,6 +590,10 @@ The transformation enforces positive length-scale parameters
 \centering
 The LOOCV objective may be non-convex, so multiple initial values reduce sensitivity to a single local optimum.
 \end{alertblock}
+
+
+
+
 
 
 
