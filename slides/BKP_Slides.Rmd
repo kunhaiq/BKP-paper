@@ -173,7 +173,7 @@ Prior information on the probability scale
 % --------------------------------------------------
 \begin{column}{0.32\textwidth}
 
-\begin{block}{2. Local evidence}
+\begin{block}{2. Local likelihood}
 \footnotesize
 \[\begin{aligned}
   k_i(\vx) &= k(\vx,\vx_i;\vtheta),\\[0.4em]
@@ -238,7 +238,73 @@ Closed-form posterior inference
 \end{alertblock}
 
 
+### Closed-Form Posterior Summaries
 
+\begin{columns}[c,onlytextwidth]
+\begin{column}{0.35\textwidth}
+\begin{block}{Probability estimation}
+\footnotesize
+\[
+\widehat{\pi}(\vx)=\frac{\alpha_n(\vx)}{\alpha_n(\vx)+\beta_n(\vx)}
+\]
+
+\begin{center}
+Posterior mean of the unknown probability surface
+\end{center}
+
+\end{block}
+
+\end{column}
+
+\hfill
+
+\begin{column}{0.6\textwidth}
+
+\begin{block}{Pointwise uncertainty}
+\footnotesize
+\[
+\operatorname{Var}\{\pi(\vx)\mid\calD\}=
+\frac{\widehat{\pi}(\vx)\{1-\widehat{\pi}(\vx)\}}
+{\alpha_n(\vx)+\beta_n(\vx)+1}
+\]
+\[
+\operatorname{CI}_{1-\delta}(\vx)=
+\left[Q_{\delta/2}(\vx),Q_{1-\delta/2}(\vx)\right]
+\]
+
+\begin{center}
+Credible intervals follow from Beta posterior quantiles
+\end{center}
+
+\end{block}
+
+\end{column}
+
+\end{columns}
+
+\vspace{0.2em}
+\begin{block}{Count prediction}
+\small
+\[
+Y_{\mathrm{new}}\mid\calD,\vx,m_{\mathrm{new}}
+\sim
+\operatorname{Beta\text{-}Binomial}
+\left\{m_{\mathrm{new}},\alpha_n(\vx),\beta_n(\vx)\right\}.
+\]
+
+\begin{center}
+Closed-form prediction for future binomial counts
+\end{center}
+
+\end{block}
+
+
+\vspace{0.2em}
+
+\begin{alertblock}{Computational implication}
+\centering
+Conditional on the kernel hyperparameters, posterior summaries and predictive distributions are available without numerical posterior approximation.
+\end{alertblock}
 
 
 
