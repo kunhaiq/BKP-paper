@@ -83,7 +83,6 @@ Estimate the underlying probability surface \(\pi(\vx)\) and quantify its pointw
 \begin{column}{0.46\textwidth}
 
 \begin{block}{Logistic regression}
-
 \[
   \pi(\vx) = \operatorname{logit}^{-1} \!\left(\vx^\top\boldsymbol{\beta}\right)
 \]
@@ -105,7 +104,6 @@ Estimate the underlying probability surface \(\pi(\vx)\) and quantify its pointw
 \begin{column}{0.46\textwidth}
 
 \begin{block}{Gaussian process classification}
-
 \[
   \pi(\vx)=\operatorname{logit}^{-1}\{f(\vx)\}, \quad f(\vx)\sim\operatorname{GP}
 \]
@@ -134,8 +132,6 @@ Can we retain nonlinear flexibility while performing direct, closed-form updatin
 
 ### Beta Kernel Process: Direct Probability-Scale Updating
 
-For each input location \(\vx\), combine a Beta prior with kernel-weighted binomial evidence.
-
 \begin{columns}[c,onlytextwidth]
 \hspace*{-0.02\textwidth}
 
@@ -144,7 +140,7 @@ For each input location \(\vx\), combine a Beta prior with kernel-weighted binom
 % --------------------------------------------------
 \begin{column}{0.28\textwidth}
 
-\begin{block}{1. Beta prior}
+\begin{block}{Beta prior}
 \footnotesize
 \[
   \pi(\vx) \sim \operatorname{Beta} \bigl\{\alpha_0(\vx),\beta_0(\vx) \bigr\}.
@@ -173,7 +169,7 @@ Prior information on the probability scale
 % --------------------------------------------------
 \begin{column}{0.32\textwidth}
 
-\begin{block}{2. Local likelihood}
+\begin{block}{Local likelihood}
 \footnotesize
 \[\begin{aligned}
   k_i(\vx) &= k(\vx,\vx_i;\vtheta),\\[0.4em]
@@ -204,7 +200,7 @@ Prior information on the probability scale
 % --------------------------------------------------
 \begin{column}{0.33\textwidth}
 
-\begin{block}{3. Beta posterior}
+\begin{block}{Beta posterior}
 
 \footnotesize
 
@@ -306,6 +302,66 @@ Closed-form prediction for future binomial counts
 Conditional on the kernel hyperparameters, posterior summaries and predictive distributions are available without numerical posterior approximation.
 \end{alertblock}
 
+### Prior Specification
+
+\begin{columns}[c,onlytextwidth]
+
+\begin{column}{0.4\textwidth}
+
+\begin{block}{Non-informative prior}
+\small
+\[
+\pi(\vx)\sim\operatorname{Beta}(1,1).
+\]
+
+\begin{center}
+Default uniform prior when no external information is available
+\end{center}
+
+\end{block}
+
+\end{column}
+
+\hfill
+
+\begin{column}{0.55\textwidth}
+
+\begin{block}{Informative prior with fixed mean}
+\small
+\[
+\alpha_0(\vx)=r_0p_0, \quad \beta_0(\vx)=r_0(1-p_0)
+\]
+\[
+\mathbb{E}\{\pi(\vx)\}=p_0, \quad \alpha_0(\vx)+\beta_0(\vx)=r_0
+\]
+
+\begin{center}
+A fixed prior mean \(p_0\) with precision controlled by \(r_0\)
+\end{center}
+
+\end{block}
+
+\end{column}
+
+\end{columns}
+
+\vspace{0.2em}
+\begin{block}{Data-adaptive prior}
+\small
+\[
+p(\vx)= \sum_{i=1}^{n} \frac{k(\vx,\vx_i)}{\textstyle\sum_{i=1}^{n}k(\vx,\vx_i)}\frac{y_i}{m_i}
+, \quad r(\vx)=r_0\sum_{i=1}^{n}k(\vx,\vx_i)
+\]
+\[
+\alpha_0(\vx)=r(\vx)p(\vx), \quad
+\beta_0(\vx)=r(\vx)\{1-p(\vx)\}.
+\]
+
+\begin{center}
+The prior mean follows the local empirical proportion, while the prior precision adapts to the local kernel mass
+\end{center}
+
+\end{block}
 
 
 
