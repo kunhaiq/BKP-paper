@@ -238,7 +238,7 @@ all_preds$BKP <- predict(
 )$mean
 
 ## Print the fitted BKP model summary reported in the manuscript workflow.
-summary(bkp_fit)
+print(summary(bkp_fit))
 
 
 ## Fit the logistic Gaussian process comparison model.

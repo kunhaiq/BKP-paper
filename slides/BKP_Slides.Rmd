@@ -307,13 +307,12 @@ Conditional on the kernel hyperparameters, posterior summaries and predictive di
 \begin{alertblock}{Idea}
 \small
 \begin{itemize}
-\item When trial sizes are heterogeneous, the standard kernel-weighted precision
+\item When trial sizes are heterogeneous, the standard kernel-weighted data contribution to posterior precision,
 \[
-m_K(\vx)=\vk(\vx)^\top\vm
+  m_K(\vx)=\vk(\vx)^\top\vm,
 \]
 may misrepresent the intended amount of local information.
-\item ESS calibration rescales the data pseudo-count to a Shepard-based target
-while preserving the kernel-weighted empirical success proportion.
+\item ESS calibration rescales the data pseudo-count to a Shepard-based target while preserving the kernel-weighted empirical success proportion.
 \end{itemize}
 \end{alertblock}
 
@@ -326,15 +325,9 @@ while preserving the kernel-weighted empirical success proportion.
 \footnotesize
 
 \[\begin{aligned}
-m_{\mathrm{tar}}(\vx)
-& =
-\rho(\vx)m_{\mathrm S}(\vx), \\
-\rho(\vx)
-& =
-\max_{1\le i\le n}
-k(\vx,\vx_i).
-\end{aligned}
-\]
+  m_{\mathrm{tar}}(\vx) & = \rho(\vx)m_{\mathrm S}(\vx), \\
+  \rho(\vx) & = \max_{1\le i\le n} k(\vx,\vx_i).
+\end{aligned}\]
 
 
 \(m_{\mathrm S}(\vx)\) interpolates the observed trial sizes.
@@ -376,14 +369,6 @@ c(\vx)\vk(\vx)^\top(\vm-\vy).
 \end{column}
 
 \end{columns}
-
-\vspace{0.1em}
-
-\begin{center}
-\scriptsize
-ESS calibration adjusts posterior precision; it is not a formal
-frequentist coverage guarantee.
-\end{center}
 
 ### Prior Specification
 
@@ -883,6 +868,49 @@ sim <- simulate(BKP_model_1D_1, nsim = 3, Xnew = Xnew)
 \centering
 \includegraphics[width=\linewidth]{ex2_sim.pdf}
 
+\end{column}
+
+\end{columns}
+
+### Effect of ESS Calibration on Pointwise Intervals
+
+\begin{columns}[c,onlytextwidth]
+\hspace*{-1em}
+\begin{column}{0.5\textwidth}
+  \vspace*{-10em}
+  \resizebox{\textwidth}{!}{%
+	\centering
+	\begin{tabular}{lllc}
+		\toprule
+		Evaluation set & Sample size & Model & Coverage (\%) \\
+		\midrule
+		\multirow{4}{*}{Evaluation grid}
+		& \multirow{2}{*}{$n=30$}
+		& BKP     & 87.1 (6.4) \\
+		& & BKP-ESS & 94.1 (3.1) \\
+		\cmidrule{2-4}
+		& \multirow{2}{*}{$n=100$}
+		& BKP     & 90.9 (4.1) \\
+		& & BKP-ESS & 97.6 (1.0) \\
+		\midrule
+		\multirow{4}{*}{Training locations}
+		& \multirow{2}{*}{$n=30$}
+		& BKP     & 88.1 (6.7) \\
+		& & BKP-ESS & 94.6 (3.3) \\
+		\cmidrule{2-4}
+		& \multirow{2}{*}{$n=100$}
+		& BKP     & 90.8 (4.1) \\
+		& & BKP-ESS & 97.6 (1.0) \\
+		\bottomrule
+	\end{tabular}
+  }
+\end{column}
+
+\hfill
+
+\begin{column}{0.55\textwidth}
+\centering
+\includegraphics[width=\linewidth]{ex2_combined.pdf}
 \end{column}
 
 \end{columns}

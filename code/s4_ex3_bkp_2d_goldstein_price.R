@@ -141,7 +141,7 @@ dev.off()
 ## locations. The predict() method returns posterior summaries such as the
 ## posterior mean, variance, and credible interval bounds.
 Xnew <- lhs(n = 10, rect = Xbounds)
-predict(BKP_model_2D, Xnew)
+print(predict(BKP_model_2D, Xnew))
 
 
 ## -------------------------------------------------------------------------
