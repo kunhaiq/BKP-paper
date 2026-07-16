@@ -693,14 +693,14 @@ BKPmodel <- fit_BKP(X, y, m, Xbounds = Xbounds)
 
 # Examples
 
-### General Linear Curve 
+### Example 1: Logistic Probability Curve
 
 - Let $x\in[-2,2]$, and suppose the true Bernoulli probability function is given by
 \begin{equation}\label{eq:bkp-1d-generate-function-1}
 	\pi_{1}(x) = \frac{1}{1+e^{-3x}}.
 \end{equation}
 
----
+### Model Fitting
 
 ```{r, include=FALSE}
 set.seed(123)
@@ -726,31 +726,38 @@ y <- rbinom(n, size = m, prob = true_pi)
 BKP_model_1D_1 <- fit_BKP(X, y, m, Xbounds = Xbounds)
 ```
 
----
+### Fitted Model Summary
 
-```{r}
+\small
+```{r example1-summary}
 summary(BKP_model_1D_1)
 ```
 
----
+### Prediction at New Inputs
 
 ```{r}
 Xnew <- lhs(n = 10, rect = Xbounds)
 predict(BKP_model_1D_1, Xnew)
 ```
 
----
+### Posterior Inference and Simulation
+
+```{r, eval=FALSE}
+plot(BKP_model_1D_1)
+Xnew <- matrix(seq(-2, 2, length = 100), ncol = 1)
+sim <- simulate(BKP_model_1D_1, nsim = 3, Xnew = Xnew)
+```
 
 \begin{columns}[c,onlytextwidth]
 
-\begin{column}{0.5\textwidth}
+\begin{column}{0.45\textwidth}
 
 \centering
 \includegraphics[width=\linewidth]{ex1.pdf}
 
 \end{column}
 
-\begin{column}{0.5\textwidth}
+\begin{column}{0.45\textwidth}
 
 \centering
 \includegraphics[width=\linewidth]{ex1_sim.pdf}
@@ -760,17 +767,20 @@ predict(BKP_model_1D_1, Xnew)
 \end{columns}
 
 
-### Highly Non-linear Curve
+### Example 2: Highly Nonlinear Probability Curve
 
-- Define the true Bernoulli probability as
+- Unlike the monotone logistic curve in Example 1, this probability function is non-monotone and locally oscillatory.
+
+- For \(x\in[-2,2]\), define
+
 \begin{equation}\label{eq:bkp-1d-generate-function-2}
 	\pi_{2}(x) = \frac{1}{2}\left[ 1+e^{-x^{2}}\cos \left( 10\frac{1-e^{-x}}{1+e^{-x}} \right) \right],
 \end{equation}
-where $x \in [-2,2]$. 
 
-- Data size: $n=30$
+- We generate \(n=30\) binomial observations and fit the default BKP model.
 
----
+
+### Posterior Inference for the Nonlinear Curve
 
 \begin{columns}[c,onlytextwidth]
 
@@ -791,22 +801,19 @@ where $x \in [-2,2]$.
 \end{columns}
 
 
-### 2D
+### Example 2: Two-Dimensional Probability Surface
 
-- Let $\vec{x} \in [0,1]^2$, and define the latent surface using a re-scaled version of the Goldstein–Price function:
-\begin{align*}
-	f(\vec{x})=& \frac{\log[\{1+a(\vec{x})\}\{30+b(\vec{x})\}-8.6928]}{2.4269}, \quad \text{with}\\
-	a(\vec{x}) =& \left(4 x_1 + 4 x_2 - 3 \right)^2  \times  \notag  \\
-	& \{75 - 56 \left(x_1 + x_2 \right) + 3\left(4 x_1 - 2 \right)^2 + 6\left(4 x_1 - 2 \right)\left(4 x_2 - 2 \right) + 3\left(4 x_2 - 2 \right)^2\}, \notag \\
-	b(\vec{x}) =& \left(8 x_1 - 12 x_2 +2 \right)^2 \times \notag \\
-	& \{-14 - 128 x_1 + 12\left(4 x_1 - 2 \right)^2 + 192 x_2 - 36\left(4 x_1 - 2 \right)\left(4 x_2 - 2 \right) + 27\left(4 x_2 - 2 \right)^2 \}.\notag 
-\end{align*} 
+- Let \(\vx\in[0,1]^2\).
 
-- The true Bernoulli probability surface is then defined by 
-\begin{equation}\label{eq:Goldstein-Price}
-	\pi_3(\vec{x}) = \Phi\{f(\vec{x})\}, 
-\end{equation}
-where $\Phi(\cdot)$ is the cumulative distribution function of the standard normal distribution.
+- A nonlinear latent surface \(f(\vx)\) is constructed from a rescaled Goldstein--Price function.
+
+- The true success probability is
+  \[
+    \pi(\vx)=\Phi\{f(\vx)\},
+  \]
+  where \(\Phi(\cdot)\) is the standard normal cumulative distribution function.
+
+- We generate \(n=100\) binomial observations and fit the BKP model.
 
 ---
 
