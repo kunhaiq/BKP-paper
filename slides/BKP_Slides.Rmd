@@ -302,6 +302,89 @@ Closed-form prediction for future binomial counts
 Conditional on the kernel hyperparameters, posterior summaries and predictive distributions are available without numerical posterior approximation.
 \end{alertblock}
 
+### Effective-Sample-Size Calibration
+
+\begin{alertblock}{Idea}
+\small
+\begin{itemize}
+\item When trial sizes are heterogeneous, the standard kernel-weighted precision
+\[
+m_K(\vx)=\vk(\vx)^\top\vm
+\]
+may misrepresent the intended amount of local information.
+\item ESS calibration rescales the data pseudo-count to a Shepard-based target
+while preserving the kernel-weighted empirical success proportion.
+\end{itemize}
+\end{alertblock}
+
+\vspace{-1em}
+\begin{columns}[T,onlytextwidth]
+
+\begin{column}{0.47\textwidth}
+
+\begin{block}{Target ESS}
+\footnotesize
+
+\[\begin{aligned}
+m_{\mathrm{tar}}(\vx)
+& =
+\rho(\vx)m_{\mathrm S}(\vx), \\
+\rho(\vx)
+& =
+\max_{1\le i\le n}
+k(\vx,\vx_i).
+\end{aligned}
+\]
+
+
+\(m_{\mathrm S}(\vx)\) interpolates the observed trial sizes.
+
+\vspace{0.3em}
+
+\(\rho(\vx)\) attenuates the target ESS in regions with weak data support.
+
+
+\end{block}
+
+\end{column}
+
+\hfill
+
+\begin{column}{0.49\textwidth}
+
+\begin{block}{Calibrated update}
+\footnotesize
+
+For \(m_K(\vx)>0\), define $c(\vx) = \dfrac{m_{\mathrm{tar}}(\vx)}{m_K(\vx)}$.
+\[
+\begin{aligned}
+\alpha_n^{\mathrm{ESS}}(\vx)
+&=
+\alpha_0(\vx)
++
+c(\vx)\vk(\vx)^\top\vy,\\[0.4em]
+\beta_n^{\mathrm{ESS}}(\vx)
+&=
+\beta_0(\vx)
++
+c(\vx)\vk(\vx)^\top(\vm-\vy).
+\end{aligned}
+\]
+
+\end{block}
+
+\end{column}
+
+\end{columns}
+
+\vspace{0.1em}
+
+\begin{center}
+\scriptsize
+ESS calibration adjusts posterior precision; it is not a formal
+frequentist coverage guarantee.
+\end{center}
+
 ### Prior Specification
 
 \begin{columns}[c,onlytextwidth]
