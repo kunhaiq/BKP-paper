@@ -682,20 +682,84 @@ BKPmodel <- fit_BKP(X, y, m, Xbounds = Xbounds)
 
   - the fitted kernel, length-scale parameters, and LOOCV results
 
-  - the prior specification and Beta prior parameters
+  - the prior specification and normalized training data
 
-  - the original and normalized training data
+  - the prior parameters \(\alpha_0\) and \(\beta_0\)
 
   - the posterior parameters \(\alpha_n\) and \(\beta_n\)
 
-- It supports downstream calls to \fct{predict}, \fct{simulate}, \fct{summary}, \fct{plot}, and \fct{print}.
+- The fitted object supports standard S3 methods, including \fct{summary}, \fct{predict}, \fct{plot}, \fct{simulate}, and \fct{print}.
 
 
+# Examples
 
+### General Linear Curve 
 
+- Let $x\in[-2,2]$, and suppose the true Bernoulli probability function is given by
+\begin{equation}\label{eq:bkp-1d-generate-function-1}
+	\pi_{1}(x) = \frac{1}{1+e^{-3x}}.
+\end{equation}
 
+---
 
+```{r, include=FALSE}
+set.seed(123)
+library(BKP)
+library(tgp)
+```
 
+```{r}
+# Define true success probability function
+true_pi_fun <- function(x) {
+  1/(1+exp(-3*x))
+}
+
+# Dataset
+n <- 7 
+Xbounds <- matrix(c(-2,2), nrow = 1)
+X <- lhs(n = n, rect = Xbounds)
+true_pi <- true_pi_fun(X)
+m <- sample(100, n, replace = TRUE)
+y <- rbinom(n, size = m, prob = true_pi)
+
+# Fit BKP model
+BKP_model_1D_1 <- fit_BKP(X, y, m, Xbounds = Xbounds)
+```
+
+---
+
+```{r}
+summary(BKP_model_1D_1)
+```
+
+---
+
+```{r}
+Xnew <- lhs(n = 10, rect = Xbounds)
+predict(BKP_model_1D_1, Xnew)
+```
+
+---
+
+:::::: {.cols data-latex=""}
+
+::: {.col data-latex="{0.5\textwidth}"}
+
+```{r, echo=FALSE, fig.align='center', out.width='100%'}
+knitr::include_graphics("ex1.pdf")
+```
+
+:::
+
+::: {.col data-latex="{0.5\textwidth}"}
+
+```{r, echo=FALSE, fig.align='center', out.width='100%'}
+knitr::include_graphics("ex1_sim.pdf")
+```
+
+:::
+
+::::::
 
 
 
