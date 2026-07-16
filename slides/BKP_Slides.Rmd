@@ -885,7 +885,7 @@ sim <- simulate(BKP_model_1D_1, nsim = 3, Xnew = Xnew)
 The disc-based test regions provide a spatial-transfer assessment rather than a conventional random train--test split.
 \end{center}
 
-### Prediction
+### Predicted Presence Probability and Posterior Uncertainty
 
 \begin{center}
 \hspace*{-0.1\textwidth}
