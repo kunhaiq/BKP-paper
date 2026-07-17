@@ -872,6 +872,14 @@ sim <- simulate(BKP_model_1D_1, nsim = 3, Xnew = Xnew)
 
 \end{columns}
 
+\vspace*{-1em}
+
+\begin{center}
+\footnotesize
+\href{https://jiangyan-zhao.github.io/BKP-website}
+{\textcolor{blue}{Explore the interactive example}}
+\end{center}
+
 ### Effect of ESS Calibration on Pointwise Intervals
 
 \begin{columns}[c,onlytextwidth]
@@ -1266,7 +1274,7 @@ Local kernel: Wendland
 
 \begin{center}
 \footnotesize
-\href{https://jiangyan-zhao.github.io/BKP-website/\#examples}
+\href{https://jiangyan-zhao.github.io/BKP-website/?section=examples}
 {\textcolor{blue}{Explore the interactive TwinBKP example}}
 \end{center}
 
