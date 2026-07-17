@@ -1209,6 +1209,24 @@ ggsave(
 )
 
 ## -------------------------------------------------------------------------
+## LGP-only probability and uncertainty figure
+## -------------------------------------------------------------------------
+
+p_lgp_only <- gridExtra::arrangeGrob(
+  all_probs$LGP,
+  all_vars$LGP,
+  ncol = 2
+)
+
+ggsave(
+  "code/figure/mourning_warbler_map_lgp.pdf",
+  plot = p_lgp_only,
+  width = 13.0,
+  height = 3.8,
+  dpi = 300
+)
+
+## -------------------------------------------------------------------------
 ## Combined manuscript figure
 ## -------------------------------------------------------------------------
 

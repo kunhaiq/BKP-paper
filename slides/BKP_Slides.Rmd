@@ -1004,7 +1004,300 @@ The disc-based test regions provide a spatial-transfer assessment rather than a 
 \end{center}
 
 
+# TwinBKP
 
+### Scalable BKP via a Global--Local Approximation
+
+\begin{columns}[c,onlytextwidth]
+
+\begin{column}{0.35\textwidth}
+
+\begin{block}{Full BKP}
+\small
+
+Full BKP uses all \(n\) observations at every input location.
+\begin{itemize}
+\item Tuning cost: $\mathcal{O}(Tn^2)$
+\item Memory: $\mathcal{O}(n^2)$
+%\item Pointwise prediction: $\mathcal{O}(n)$
+\end{itemize}
+
+\end{block}
+
+\end{column}
+
+\hfill
+
+\begin{column}{0.6\textwidth}
+\begin{alertblock}{Global--local idea}
+\centering
+\begin{itemize}
+\item  global subset captures broad input--response structure
+\item prediction-specific local neighbours refine the posterior update near
+the target location
+\end{itemize}
+\end{alertblock}
+
+\end{column}
+
+\end{columns}
+
+\vspace{0.3em}
+
+\begin{block}{TwinBKP subsets}
+\small
+
+A representative global subset is shared across all prediction locations:
+\[
+G\subset\{1,\ldots,n\},
+\qquad |G|=g.
+\]
+
+For each target \(\vx\), select \(\ell\) nearest non-global observations:
+\[
+L(\vx)\subset\{1,\ldots,n\}\setminus G,
+\qquad |L(\vx)|=\ell.
+\]
+
+The prediction-specific subset is $I(\vx)=G\cup L(\vx)$.
+
+\end{block}
+
+
+### Two-Stage Conjugate Update
+
+\begin{columns}[t,onlytextwidth]
+
+\begin{column}{0.47\textwidth}
+
+\begin{block}{Stage 1: Global update}
+\small
+
+The global subset defines an intermediate Beta distribution:
+\[
+\begin{aligned}
+\alpha_G(\vx)
+&=
+\alpha_0(\vx)
++
+\sum_{i\in G}
+k_g(\vx,\vx_i;\vtheta_g)y_i,\\[0.4em]
+\beta_G(\vx)
+&=
+\beta_0(\vx)
++
+\sum_{i\in G}
+k_g(\vx,\vx_i;\vtheta_g)(m_i-y_i).
+\end{aligned}
+\]
+
+\end{block}
+
+\end{column}
+
+\hfill
+
+\begin{column}{0.51\textwidth}
+
+\begin{block}{Stage 2: Local refinement}
+\small
+
+The intermediate distribution is updated using the local neighbours:
+\[
+\begin{aligned}
+\alpha_T(\vx)
+&=
+\alpha_G(\vx)
++
+\sum_{i\in L(\vx)}
+k_{\ell}(\vx,\vx_i;\theta_{\ell})y_i,\\[0.4em]
+\beta_T(\vx)
+&=
+\beta_G(\vx)
++
+\sum_{i\in L(\vx)}
+k_{\ell}(\vx,\vx_i;\theta_{\ell})(m_i-y_i).
+\end{aligned}
+\]
+
+\end{block}
+
+\end{column}
+
+\end{columns}
+
+\vspace{0.3em}
+
+\begin{alertblock}{TwinBKP posterior}
+\centering
+\vspace*{-0.5em}
+\[
+\pi(\vx)\mid\mathcal D_{I(\vx)}
+\sim
+\operatorname{Beta}
+\left\{
+\alpha_T(\vx),
+\beta_T(\vx)
+\right\},
+\qquad
+I(\vx)=G\cup L(\vx).
+\]
+\end{alertblock}
+
+
+### Kernel Tuning and Computational Scaling
+
+\begin{block}{Default subset sizes}
+\small
+
+\[
+g=
+\min\left\{
+n-1,\,
+50d,\,
+\max\left(\lfloor\sqrt{n}\rfloor,10d\right)
+\right\},
+\qquad
+\ell=
+\min\left\{
+n-g,\,
+\max(25,3d)
+\right\}.
+\]
+
+\end{block}
+
+\vspace{0.15em}
+
+\begin{columns}[T,onlytextwidth]
+
+\begin{column}{0.49\textwidth}
+
+\begin{block}{Kernel parameters}
+\footnotesize
+\begin{itemize}
+\item The global length scale \(\vtheta_g\) is selected by the same LOOCV criterion as full BKP, but using only the global subset.
+
+\item The local range parameter is not separately optimized. It is set to the empirical covering radius
+\[
+\widehat{\theta}_{\ell}
+=
+\max_{1\le i\le n}
+\min_{j\in G}
+\|\vx_i-\vx_j\|_2
+\]
+on the normalized input scale.
+\end{itemize}
+
+\end{block}
+
+\end{column}
+
+\hfill
+
+\begin{column}{0.47\textwidth}
+
+\begin{block}{Computational cost}
+\footnotesize
+\[
+\begin{aligned}
+\text{Fitting:}\quad
+&\mathcal{O}(n\log n+T_g g^2),\\[0.4em]
+\text{Memory:}\quad
+&\mathcal{O}(n+g^2),\\[0.4em]
+\text{Prediction at \(t\) locations:}\quad
+&\mathcal{O}\{t(\log n+g+\ell)\}.
+\end{aligned}
+\]
+
+No dense \(n\times n\) kernel matrix is stored by default.
+
+\end{block}
+
+\end{column}
+
+\end{columns}
+
+
+### Example 8: TwinBKP for a Nonlinear Probability Curve
+
+```{r example8-twinbkp, eval=FALSE}
+TwinBKP_model <- fit_TwinBKP(X, y, m, Xbounds = Xbounds)
+```
+
+\begin{columns}[c,onlytextwidth]
+
+\begin{column}{0.34\textwidth}
+
+\small
+
+The nonlinear probability function from Example 2 is reused, with the
+sample size increased from \(30\) to \(500\).
+
+\begin{block}{Realized default structure}
+\footnotesize
+\[
+g=22,
+\]
+\[
+\ell=25,
+\]
+
+\begin{center}
+Global kernel: Gaussian
+
+Local kernel: Wendland
+\end{center}
+
+\end{block}
+
+\end{column}
+
+\hfill
+
+\begin{column}{0.62\textwidth}
+
+\centering
+\includegraphics[width=\linewidth]{ex8.pdf}
+
+\end{column}
+
+\end{columns}
+
+\begin{center}
+\footnotesize
+\href{https://jiangyan-zhao.github.io/BKP-website/\#examples}
+{\textcolor{blue}{Explore the interactive TwinBKP example}}
+\end{center}
+
+
+### Mourning Warbler: Full BKP versus TwinBKP
+
+\begin{center}
+\hspace*{-0.1\textwidth}
+\includegraphics[width=1.2\linewidth]{mourning_warbler_map_twinbkp.pdf}
+\end{center}
+
+
+### Mourning Warbler: Full BKP versus TwinBKP
+
+\begin{center}
+\includegraphics[width=\linewidth]{mourning_warbler_map_lgp.pdf}
+\end{center}
+
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lccc}
+\toprule
+Model & AUC & Brier score & Elapsed time (s) \\
+\midrule
+BKP     & 0.888 & 0.0691 & 8.51 \\
+TwinBKP & 0.912 & 0.0669 & 0.05 \\
+LGP     & 0.852 & 0.0798 & 535.50 \\
+\bottomrule
+\end{tabular}
+\end{center}
 
 
 
