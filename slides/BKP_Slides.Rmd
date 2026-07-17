@@ -233,6 +233,10 @@ Closed-form posterior inference
 \textbf{flexible modeling with closed-form posterior inference}.
 \end{alertblock}
 
+\footnotesize
+BKP is a Bayesian-inspired probability-scale smoother based on
+kernel-weighted local-likelihood conjugate updating.
+
 
 ### Closed-Form Posterior Summaries
 
@@ -1279,7 +1283,7 @@ Local kernel: Wendland
 \end{center}
 
 
-### Mourning Warbler: Full BKP versus TwinBKP
+### TwinBKP Prediction for Mourning Warbler
 
 \begin{center}
 \hspace*{-0.1\textwidth}
@@ -1287,7 +1291,7 @@ Local kernel: Wendland
 \end{center}
 
 
-### Mourning Warbler: Full BKP versus TwinBKP
+### Mourning Warbler: BKP versus LGP
 
 \begin{center}
 \includegraphics[width=\linewidth]{mourning_warbler_map_lgp.pdf}
@@ -1308,9 +1312,60 @@ LGP     & 0.852 & 0.0798 & 535.50 \\
 \end{center}
 
 
+# DKP
+
+### Extension to Multiclass Responses: DKP
+
+\begin{alertblock}{Key idea}
+\[
+\begin{array}{ccc}
+\text{Binomial response}
+& \longrightarrow &
+\text{Multinomial response}
+\\[0.4em]
+\text{Beta distribution}
+& \longrightarrow &
+\text{Dirichlet distribution}
+\\[0.4em]
+\pi(\vx)
+& \longrightarrow &
+\boldsymbol{\pi}(\vx)
+=
+\{\pi_1(\vx),\ldots,\pi_q(\vx)\}
+\end{array}
+\]
+\end{alertblock}
+
+\vspace{0.4em}
+
+\begin{block}{Kernel-weighted Dirichlet update}
+\small
+
+Let \(\mathbf{Y}\in\mathbb{R}^{n\times q}\) contain the observed class counts.
+Then
+\[
+\boldsymbol{\pi}(\vx)\mid\mathcal D_n
+\sim
+\operatorname{Dirichlet}
+\left\{
+\boldsymbol{\alpha}_n(\vx)
+\right\},
+\]
+\[
+\boldsymbol{\alpha}_n(\vx)
+=
+\boldsymbol{\alpha}_0(\vx)
++
+\vk(\vx)^\top\mathbf{Y}.
+\]
+
+\end{block}
 
 
-
+\begin{center}
+\small
+DKP extends the BKP update from a scalar success probability to an input-dependent vector of class probabilities.
+\end{center}
 
 
 
