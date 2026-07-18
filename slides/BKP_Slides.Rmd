@@ -1368,15 +1368,210 @@ DKP extends the BKP update from a scalar success probability to an input-depende
 \end{center}
 
 
+### Example 7: Iris Classification with DKP
+
+\centering
+\includegraphics[width=\linewidth]{ex7.pdf}
+
+\footnotesize
+\(\circ\) setosa,\qquad \(\triangle\) versicolor,\qquad \(+\) virginica.
 
 
+# Summary
+
+### Summary
+
+\begin{block}{Core contribution}
+\small
+To our knowledge, \pkg{BKP} is the first publicly available
+\proglang{R} package dedicated to BKP and DKP methodology for
+input-dependent binomial and multinomial probabilities.
+\end{block}
+
+\vspace{0.25em}
+
+\begin{columns}[T,onlytextwidth]
+
+\begin{column}{0.48\textwidth}
+
+\begin{block}{Statistical framework}
+\small
+\begin{itemize}
+
+\item Performs kernel-weighted conjugate updating directly on the
+probability scale
+
+\item Provides closed-form posterior summaries and predictive
+distributions for binomial and multinomial responses
+
+\item Extends the scalar Beta update to the vector-valued
+Dirichlet update through DKP
+
+\end{itemize}
+\end{block}
+
+\end{column}
+
+\hfill
+
+\begin{column}{0.48\textwidth}
+
+\begin{block}{Software and scalability}
+\small
+\begin{itemize}
+
+\item Supports flexible priors, four kernel families, isotropic or
+anisotropic length scales, and LOOCV-based tuning
+
+\item Provides Shepard ESS calibration for controlling the scale of
+kernel-weighted pseudo-counts
+
+\item Implements TwinBKP and TwinDKP as scalable global--local
+approximations
+
+\end{itemize}
+\end{block}
+
+\end{column}
+
+\end{columns}
 
 
+### Limitations and Future Directions
+
+\begin{alertblock}{Current limitation}
+\centering
+\small
+The pointwise posterior-style intervals produced by the fitted BKP
+update do not automatically provide finite-sample frequentist coverage
+guarantees.
+\end{alertblock}
+
+\begin{columns}[T,onlytextwidth]
+
+\begin{column}{0.48\textwidth}
+
+\begin{block}{Uncertainty calibration and theory}
+\small
+\begin{itemize}
+
+\item Develop conformalized BKP procedures for future Bernoulli,
+binomial, and multinomial responses
+
+\item Construct calibrated pointwise intervals and simultaneous bands
+for latent probability surfaces
+
+\item Study theoretical properties of the full and global--local
+updates
+
+\end{itemize}
+\end{block}
+
+\end{column}
+
+\hfill
+
+\begin{column}{0.48\textwidth}
+
+\begin{block}{Broader modeling scope}
+\small
+\begin{itemize}
+
+\item Extend the framework to functional, longitudinal,
+spatio-temporal, and multivariate responses
+
+\item Accommodate combinations of qualitative and quantitative inputs
+
+\item Explore likelihood-specific extensions for over-dispersed counts,
+waiting times, and other non-binomial outcomes
+
+\end{itemize}
+\end{block}
+
+\end{column}
+
+\end{columns}
+
+\vspace{0.25em}
+
+\begin{center}
+\small
+Community contributions through issues and pull requests are welcome.
+\end{center}
 
 
+### Resources
 
+\begin{columns}[c,onlytextwidth]
 
+\begin{column}{0.51\textwidth}
 
+\begin{block}{Software}
+\small
+
+\textcolor{blue}{\faRProject}\quad
+\href{https://cran.r-project.org/web/packages/BKP/BKP.html}
+{\textcolor{blue}{BKP on CRAN: package and documentation}}
+
+\vspace{0.65em}
+
+\textcolor{black}{\faGithub}\quad
+\href{https://github.com/Jiangyan-Zhao/BKP}
+{\textcolor{blue}{Source code, development, and issue tracker}}
+
+\end{block}
+
+\vspace{0.3em}
+
+\begin{block}{Paper and project materials}
+\small
+
+\textcolor{red}{\faFilePdf}\quad
+\href{https://arxiv.org/abs/2508.10447}
+{\textcolor{blue}{BKP software paper on arXiv}}
+
+\vspace{0.65em}
+
+\textcolor{black}{\faGithub}\quad
+\href{https://github.com/Jiangyan-Zhao/BKP-paper}
+{\textcolor{blue}{Code, data, results, figures, slides, and manuscript}}
+
+\end{block}
+
+\vspace{0.3em}
+
+\begin{block}{Project website}
+\small
+
+\href{https://jiangyan-zhao.github.io/BKP-website/}
+{\textcolor{blue}{Interactive examples, installation guidance, and resources}}
+
+\end{block}
+
+\end{column}
+
+\hfill
+
+\begin{column}{0.43\textwidth}
+
+\centering
+
+\includegraphics[width=0.90\linewidth]{qr_website.png}
+
+\vspace{0.25em}
+
+\small
+\textbf{Scan to visit the BKP website}
+
+\vspace{0.15em}
+
+\footnotesize
+\href{https://jiangyan-zhao.github.io/BKP-website/}
+{\textcolor{blue}{jiangyan-zhao.github.io/BKP-website}}
+
+\end{column}
+
+\end{columns}
 
 
 ---
