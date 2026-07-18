@@ -1,10 +1,16 @@
-# BKP-paper
+# BKP: An R Package for Beta Kernel Process Modeling
 
-This repository contains the reproduction scripts, data-processing code, generated figures, numerical results, and manuscript source files for the paper:
+This repository contains the reproducibility materials, manuscript source files, and presentation slides for the BKP software paper.
 
-**BKP: An R Package for Beta Kernel Process Modeling**
+It includes the analysis scripts, data-processing code, generated figures, numerical results, manuscript files, and Beamer presentation materials.
 
-The repository is organized to reproduce the illustrative examples in Section 4, the real-data applications in Section 5, and the predictive-coverage simulation reported in the appendix.
+The repository is organized to reproduce:
+
+1.  the illustrative examples in Section 4;
+2.  the real-data applications in Section 5;
+3.  the predictive-coverage simulation reported in the appendix.
+
+A compiled version of the manuscript is available at [`paper/TR_BKP.pdf`](paper/TR_BKP.pdf), and the presentation slides are available at [`slides/BKP_Slides.pdf`](slides/BKP_Slides.pdf).
 
 ## Repository structure
 
@@ -33,6 +39,15 @@ BKP-paper/
 │   ├── refs.bib
 │   ├── jss.cls
 │   └── jss.bst
+├── slides/
+│   ├── BKP_Slides.Rmd
+│   ├── BKP_Slides.pdf
+│   ├── preamble.tex
+│   ├── ecnu.sty
+│   ├── ecnu_logo.png
+│   ├── ecnu_title.png
+│   ├── Thanks.png
+│   └── qr_website.png
 ├── renv.lock
 └── README.md
 ```
@@ -201,9 +216,57 @@ code/figure/
 
 through the graphic path setting in `TR_BKP.tex`.
 
+## Presentation slides
+
+The accompanying Beamer presentation is maintained in:
+
+``` text
+slides/
+```
+
+The main source file is:
+
+``` text
+slides/BKP_Slides.Rmd
+```
+
+A compiled version of the presentation is provided at:
+
+``` text
+slides/BKP_Slides.pdf
+```
+
+The presentation uses the custom Beamer configuration in `slides/preamble.tex` and `slides/ecnu.sty`. Slide-specific assets, including the ECNU logos, the closing image, and the BKP website QR code, are also stored in `slides/`.
+
+The slides reuse the generated figures from:
+
+``` text
+code/figure/
+```
+
+and the bibliography from:
+
+``` text
+paper/refs.bib
+```
+
+To render the slides from the repository root, run:
+
+``` r
+rmarkdown::render("slides/BKP_Slides.Rmd")
+```
+
+Before rendering, restore the recorded R package environment:
+
+``` r
+renv::restore()
+```
+
+A working LaTeX distribution, such as TinyTeX or TeX Live, is also required.
+
 ## Working directory
 
-All scripts assume that the current working directory is the repository root, namely the directory containing `renv.lock`, `code/`, and `paper/`.
+Run the analysis scripts and render the presentation from the repository root, namely the directory containing `renv.lock`, `code/`, `paper/`, and `slides/`.
 
 For example, run:
 
@@ -211,7 +274,11 @@ For example, run:
 source("code/run_all.R")
 ```
 
-from the repository root.
+or render the slides using:
+
+``` r
+rmarkdown::render("slides/BKP_Slides.Rmd")
+```
 
 Do not change the working directory to `code/` before running the scripts, because paths such as `code/data/`, `code/figure/`, and `code/result/` are defined relative to the repository root.
 

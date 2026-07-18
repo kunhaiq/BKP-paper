@@ -1517,7 +1517,7 @@ Community contributions through issues and pull requests are welcome.
 
 \textcolor{black}{\faGithub}\quad
 \href{https://github.com/Jiangyan-Zhao/BKP}
-{\textcolor{blue}{Source code, development, and issue tracker}}
+{{\textcolor{blue}{Source code and package development}}}
 
 \end{block}
 
