@@ -78,14 +78,14 @@ Estimate the underlying probability surface \(\pi(\vx)\) and quantify its pointw
 
 ### Existing Approaches and the Remaining Gap
 
-\begin{columns}[c,onlytextwidth]
+\begin{columns}[T,onlytextwidth]
 
 \begin{column}{0.46\textwidth}
 
 \begin{block}{Logistic regression}
-\[
+$$
   \pi(\vx) = \operatorname{logit}^{-1} \!\left(\vx^\top\boldsymbol{\beta}\right)
-\]
+$$
 
 \begin{center}
 \textcolor{red}{Fast and interpretable}
@@ -104,16 +104,18 @@ Estimate the underlying probability surface \(\pi(\vx)\) and quantify its pointw
 \begin{column}{0.46\textwidth}
 
 \begin{block}{Gaussian process classification}
-\[
+$$
   \pi(\vx)=\operatorname{logit}^{-1}\{f(\vx)\}, \quad f(\vx)\sim\operatorname{GP}
-\]
+$$
 
 \begin{center}
 \textcolor{red}{Flexible probability surfaces}
 \end{center}
 
 \begin{center}
-\textcolor{blue}{Approximate posterior inference}
+\textcolor{blue}{Approximate posterior inference}\\[-0.15em]
+\scriptsize
+\citep{Rasmussen2006GPML,Nickisch2008BinaryGP}
 \end{center}
 
 \end{block}
@@ -127,6 +129,7 @@ Estimate the underlying probability surface \(\pi(\vx)\) and quantify its pointw
 \begin{alertblock}{Motivation}
 Can we retain nonlinear flexibility while performing direct, closed-form updating on the probability scale?
 \end{alertblock}
+
 
 # Methodology
 
@@ -142,9 +145,9 @@ Can we retain nonlinear flexibility while performing direct, closed-form updatin
 
 \begin{block}{Beta prior}
 \footnotesize
-\[
+$$
   \pi(\vx) \sim \operatorname{Beta} \bigl\{\alpha_0(\vx),\beta_0(\vx) \bigr\}.
-\]
+$$
 
 \vspace{0.4em}
 
@@ -171,11 +174,13 @@ Prior information on the probability scale
 
 \begin{block}{Local likelihood}
 \footnotesize
-\[\begin{aligned}
+$$
+\begin{aligned}
   k_i(\vx) &= k(\vx,\vx_i;\vtheta),\\[0.4em]
   S(\vx) &= \textstyle\sum_{i=1}^{n} k_i(\vx)y_i,\\[0.4em]
   F(\vx) &= \textstyle\sum_{i=1}^{n} k_i(\vx)(m_i-y_i).
-\end{aligned}\]
+\end{aligned}
+$$
 
 \vspace{0.2em}
 
@@ -204,11 +209,13 @@ Prior information on the probability scale
 
 \footnotesize
 
-\[\begin{aligned}
+$$
+\begin{aligned}
   \pi(\vx)\mid\calD &\sim \operatorname{Beta} \bigl\{\alpha_n(\vx),\beta_n(\vx)\bigr\},\\[0.4em]
   \alpha_n(\vx) &= \alpha_0(\vx)+S(\vx),\\[0.4em]
   \beta_n(\vx) &= \beta_0(\vx)+F(\vx).
-\end{aligned}\]
+\end{aligned}
+$$
 
 \vspace{0.2em}
 
@@ -235,7 +242,8 @@ Closed-form posterior inference
 
 \footnotesize
 BKP is a Bayesian-inspired probability-scale smoother based on
-kernel-weighted local-likelihood conjugate updating.
+kernel-weighted local-likelihood conjugate updating
+\citep{Goetschalckx:2011,MacKenzie2014,Rolland2019BKP,Fan1998LocalMLE}.
 
 
 ### Closed-Form Posterior Summaries
@@ -244,9 +252,9 @@ kernel-weighted local-likelihood conjugate updating.
 \begin{column}{0.35\textwidth}
 \begin{block}{Probability estimation}
 \footnotesize
-\[
+$$
 \widehat{\pi}(\vx)=\frac{\alpha_n(\vx)}{\alpha_n(\vx)+\beta_n(\vx)}
-\]
+$$
 
 \begin{center}
 Posterior mean of the unknown probability surface
@@ -262,15 +270,15 @@ Posterior mean of the unknown probability surface
 
 \begin{block}{Pointwise uncertainty}
 \footnotesize
-\[
+$$
 \operatorname{Var}\{\pi(\vx)\mid\calD\}=
 \frac{\widehat{\pi}(\vx)\{1-\widehat{\pi}(\vx)\}}
 {\alpha_n(\vx)+\beta_n(\vx)+1}
-\]
-\[
+$$
+$$
 \operatorname{CI}_{1-\delta}(\vx)=
 \left[Q_{\delta/2}(\vx),Q_{1-\delta/2}(\vx)\right]
-\]
+$$
 
 \begin{center}
 Credible intervals follow from Beta posterior quantiles
@@ -285,12 +293,12 @@ Credible intervals follow from Beta posterior quantiles
 \vspace{0.2em}
 \begin{block}{Count prediction}
 \small
-\[
+$$
 Y_{\mathrm{new}}\mid\calD,\vx,m_{\mathrm{new}}
 \sim
 \operatorname{Beta\text{-}Binomial}
 \left\{m_{\mathrm{new}},\alpha_n(\vx),\beta_n(\vx)\right\}.
-\]
+$$
 
 \begin{center}
 Closed-form prediction for future binomial counts
@@ -312,11 +320,11 @@ Conditional on the kernel hyperparameters, posterior summaries and predictive di
 \small
 \begin{itemize}
 \item When trial sizes are heterogeneous, the standard kernel-weighted data contribution to posterior precision,
-\[
+$$
   m_K(\vx)=\vk(\vx)^\top\vm,
-\]
+$$
 may misrepresent the intended amount of local information.
-\item ESS calibration rescales the data pseudo-count to a Shepard-based target while preserving the kernel-weighted empirical success proportion.
+\item ESS calibration rescales the data pseudo-count to a Shepard-based target \citep{Shepard1968} while preserving the kernel-weighted empirical success proportion.
 \end{itemize}
 \end{alertblock}
 
@@ -328,10 +336,10 @@ may misrepresent the intended amount of local information.
 \begin{block}{Target ESS}
 \footnotesize
 
-\[\begin{aligned}
+$$\begin{aligned}
   m_{\mathrm{tar}}(\vx) & = \rho(\vx)m_{\mathrm S}(\vx), \\
   \rho(\vx) & = \max_{1\le i\le n} k(\vx,\vx_i).
-\end{aligned}\]
+\end{aligned}$$
 
 
 \(m_{\mathrm S}(\vx)\) interpolates the observed trial sizes.
@@ -353,7 +361,7 @@ may misrepresent the intended amount of local information.
 \footnotesize
 
 For \(m_K(\vx)>0\), define $c(\vx) = \dfrac{m_{\mathrm{tar}}(\vx)}{m_K(\vx)}$.
-\[
+$$
 \begin{aligned}
 \alpha_n^{\mathrm{ESS}}(\vx)
 &=
@@ -366,7 +374,7 @@ c(\vx)\vk(\vx)^\top\vy,\\[0.4em]
 +
 c(\vx)\vk(\vx)^\top(\vm-\vy).
 \end{aligned}
-\]
+$$
 
 \end{block}
 
@@ -400,12 +408,12 @@ Default uniform prior when no external information is available
 
 \begin{block}{Informative prior with fixed mean}
 \small
-\[
+$$
 \alpha_0(\vx)=r_0p_0, \quad \beta_0(\vx)=r_0(1-p_0)
-\]
-\[
+$$
+$$
 \mathbb{E}\{\pi(\vx)\}=p_0, \quad \alpha_0(\vx)+\beta_0(\vx)=r_0
-\]
+$$
 
 \begin{center}
 A fixed prior mean \(p_0\) with precision controlled by \(r_0\)
@@ -420,14 +428,14 @@ A fixed prior mean \(p_0\) with precision controlled by \(r_0\)
 \vspace{0.2em}
 \begin{block}{Data-adaptive prior}
 \small
-\[
+$$
 p(\vx)= \sum_{i=1}^{n} \frac{k(\vx,\vx_i)}{\textstyle\sum_{i=1}^{n}k(\vx,\vx_i)}\frac{y_i}{m_i}
 , \quad r(\vx)=r_0\sum_{i=1}^{n}k(\vx,\vx_i)
-\]
-\[
+$$
+$$
 \alpha_0(\vx)=r(\vx)p(\vx), \quad
 \beta_0(\vx)=r(\vx)\{1-p(\vx)\}.
-\]
+$$
 
 \begin{center}
 The prior mean follows the local empirical proportion, while the prior precision adapts to the local kernel mass
@@ -444,11 +452,9 @@ The prior mean follows the local empirical proportion, while the prior precision
 
 \begin{block}{Scaled distance}
 \small
-\[
-h(\vx,\vx';\vtheta)=
-\sqrt{\sum_{j=1}^{d}
-\left(\frac{x_j-x_j'}{\theta_j}\right)^2}.
-\]
+$$
+  h(\vx,\vx';\vtheta)=\sqrt{\sum_{j=1}^{d}\left(\frac{x_j-x_j'}{\theta_j}\right)^2}.
+$$
 
 \begin{itemize}
 \item Smaller \(\theta_j\): more localized borrowing and greater sensitivity along dimension \(j\)
@@ -465,14 +471,14 @@ h(\vx,\vx';\vtheta)=
 
 \begin{block}{Length-scale structure}
 \small
-\[
+$$
 \text{Isotropic:}\qquad
 \theta_1=\cdots=\theta_d=\theta
-\]
-\[
+$$
+$$
 \text{Anisotropic:}\qquad
 \vtheta=(\theta_1,\ldots,\theta_d)
-\]
+$$
 
 \begin{center}
 An isotropic kernel uses a common length scale across dimensions, whereas an anisotropic kernel allows dimension-specific borrowing ranges
@@ -496,7 +502,7 @@ The length-scale parameters determine how rapidly information borrowing decrease
 
 \begin{block}{Implemented kernels}
 \small
-\[
+$$
 \begin{aligned}
 \text{Gaussian:}\qquad
 k(h) &= \exp(-h^2),\\[0.5em]
@@ -507,7 +513,7 @@ k(h) &= \left(1+\sqrt{3}h\right)\exp(-\sqrt{3}h),\\[0.5em]
 \text{Wendland:}\qquad
 k(h) &= (\zeta h+1)\max\{0,1-h\}^{\zeta}, \quad \zeta=\lfloor d/2\rfloor+3.
 \end{aligned}
-\]
+$$
 \end{block}
 
 \vspace{0.4em}
@@ -559,14 +565,14 @@ Observations with \(h\geq 1\) receive exactly zero weight.
 
 \begin{alertblock}{Selection criterion}
 \small
-\[
+$$
 \widehat{\vtheta}
 =
 \underset{\vtheta}{\argmin}\,
 L(\vtheta;\calD_n),
 \quad
 L\in\{\mathrm{BS},\mathrm{LL}\}.
-\]
+$$
 \end{alertblock}
 
 \end{column}
@@ -577,23 +583,23 @@ L\in\{\mathrm{BS},\mathrm{LL}\}.
 
 \begin{block}{Brier score}
 \small
-\[
+$$
 \mathrm{BS}(\vtheta)=\frac{1}{n}\sum_{i=1}^{n}
 \left\{\widehat{\pi}^{-i}(\vx_i;\vtheta)-\widetilde{\pi}_i\right\}^{2}.
-\]
+$$
 \end{block}
 
 \vspace{0.15em}
 
 \begin{block}{Log-loss}
 \small
-\[
+$$
 \mathrm{LL}(\vtheta)=-\frac{1}{n}\sum_{i=1}^{n}
 \left[
 \widetilde{\pi}_i\log\widehat{\pi}^{-i}(\vx_i;\vtheta)
 +(1-\widetilde{\pi}_i)\log\{1-\widehat{\pi}^{-i}(\vx_i;\vtheta)\}
 \right].
-\]
+$$
 \end{block}
 
 \begin{center}
@@ -610,18 +616,18 @@ All leave-one-out predictions are obtained from one kernel matrix by setting its
 
 \begin{block}{Log-scale reparameterization}
 \small
-\[
+$$
 \gamma_j=\log_{10}(\theta_j),
 \quad
 \theta_j=10^{\gamma_j}.
-\]
-\[
+$$
+$$
 d_\gamma=
 \begin{cases}
 1, & \text{isotropic},\\
 d, & \text{anisotropic}.
 \end{cases}
-\]
+$$
 
 \begin{center}
 The transformation enforces positive length-scale parameters
@@ -645,10 +651,10 @@ The transformation enforces positive length-scale parameters
   \item Retain the solution with the smallest LOOCV loss
 
   \end{enumerate}
-\[
+$$
   s^\star= \underset{1\leq s\leq n_0}{\argmin}\; L\!\left(\widehat{\vgamma}^{(s)};\calD_n\right),
 \quad \widehat{\vgamma} = \widehat{\vgamma}^{(s^\star)}.
-\]
+$$
 
 \end{block}
 
@@ -986,11 +992,11 @@ sim <- simulate(BKP_model_1D_1, nsim = 3, Xnew = Xnew)
 
 \hfill
 
-\begin{column}{0.43\textwidth}
+\begin{column}{0.45\textwidth}
 
 \begin{itemize}
 \small
-\item Presence--absence data from the North American Breeding Bird Survey
+\item Presence--absence data from the North American Breeding Bird Survey \citep{sauer2014north}
 
 \item \(1{,}613\) training observations and \(301\) spatially withheld test observations
 
@@ -1051,6 +1057,7 @@ Full BKP uses all \(n\) observations at every input location.
 \item  global subset captures broad input--response structure
 \item prediction-specific local neighbours refine the posterior update near
 the target location
+\item ref: \citet{Vakayil2022Twinning,Vakayil2024TwinGP}
 \end{itemize}
 \end{alertblock}
 
@@ -1064,16 +1071,14 @@ the target location
 \small
 
 A representative global subset is shared across all prediction locations:
-\[
-G\subset\{1,\ldots,n\},
-\qquad |G|=g.
-\]
+$$
+  G\subset\{1,\ldots,n\}, \qquad |G|=g.
+$$
 
 For each target \(\vx\), select \(\ell\) nearest non-global observations:
-\[
-L(\vx)\subset\{1,\ldots,n\}\setminus G,
-\qquad |L(\vx)|=\ell.
-\]
+$$
+  L(\vx)\subset\{1,\ldots,n\}\setminus G, \qquad |L(\vx)|=\ell.
+$$
 
 The prediction-specific subset is $I(\vx)=G\cup L(\vx)$.
 
@@ -1090,7 +1095,7 @@ The prediction-specific subset is $I(\vx)=G\cup L(\vx)$.
 \small
 
 The global subset defines an intermediate Beta distribution:
-\[
+$$
 \begin{aligned}
 \alpha_G(\vx)
 &=
@@ -1105,7 +1110,7 @@ k_g(\vx,\vx_i;\vtheta_g)y_i,\\[0.4em]
 \sum_{i\in G}
 k_g(\vx,\vx_i;\vtheta_g)(m_i-y_i).
 \end{aligned}
-\]
+$$
 
 \end{block}
 
@@ -1119,7 +1124,7 @@ k_g(\vx,\vx_i;\vtheta_g)(m_i-y_i).
 \small
 
 The intermediate distribution is updated using the local neighbours:
-\[
+$$
 \begin{aligned}
 \alpha_T(\vx)
 &=
@@ -1134,7 +1139,7 @@ k_{\ell}(\vx,\vx_i;\theta_{\ell})y_i,\\[0.4em]
 \sum_{i\in L(\vx)}
 k_{\ell}(\vx,\vx_i;\theta_{\ell})(m_i-y_i).
 \end{aligned}
-\]
+$$
 
 \end{block}
 
@@ -1147,7 +1152,7 @@ k_{\ell}(\vx,\vx_i;\theta_{\ell})(m_i-y_i).
 \begin{alertblock}{TwinBKP posterior}
 \centering
 \vspace*{-0.5em}
-\[
+$$
 \pi(\vx)\mid\mathcal D_{I(\vx)}
 \sim
 \operatorname{Beta}
@@ -1157,7 +1162,7 @@ k_{\ell}(\vx,\vx_i;\theta_{\ell})(m_i-y_i).
 \right\},
 \qquad
 I(\vx)=G\cup L(\vx).
-\]
+$$
 \end{alertblock}
 
 
@@ -1166,7 +1171,7 @@ I(\vx)=G\cup L(\vx).
 \begin{block}{Default subset sizes}
 \small
 
-\[
+$$
 g=
 \min\left\{
 n-1,\,
@@ -1179,7 +1184,7 @@ n-1,\,
 n-g,\,
 \max(25,3d)
 \right\}.
-\]
+$$
 
 \end{block}
 
@@ -1195,13 +1200,13 @@ n-g,\,
 \item The global length scale \(\vtheta_g\) is selected by the same LOOCV criterion as full BKP, but using only the global subset.
 
 \item The local range parameter is not separately optimized. It is set to the empirical covering radius
-\[
+$$
 \widehat{\theta}_{\ell}
 =
 \max_{1\le i\le n}
 \min_{j\in G}
 \|\vx_i-\vx_j\|_2
-\]
+$$
 on the normalized input scale.
 \end{itemize}
 
@@ -1215,7 +1220,7 @@ on the normalized input scale.
 
 \begin{block}{Computational cost}
 \footnotesize
-\[
+$$
 \begin{aligned}
 \text{Fitting:}\quad
 &\mathcal{O}(n\log n+T_g g^2),\\[0.4em]
@@ -1224,7 +1229,7 @@ on the normalized input scale.
 \text{Prediction at \(t\) locations:}\quad
 &\mathcal{O}\{t(\log n+g+\ell)\}.
 \end{aligned}
-\]
+$$
 
 No dense \(n\times n\) kernel matrix is stored by default.
 
@@ -1252,14 +1257,11 @@ sample size increased from \(30\) to \(500\).
 
 \begin{block}{Realized default structure}
 \footnotesize
-\[
-g=22,
-\]
-\[
-\ell=25,
-\]
-
 \begin{center}
+$g=22$
+
+$\ell=25$
+
 Global kernel: Gaussian
 
 Local kernel: Wendland
@@ -1310,7 +1312,7 @@ Model & AUC & Brier score & Elapsed time (s) \\
 \midrule
 BKP     & 0.888 & 0.0691 & 8.51 \\
 TwinBKP & 0.912 & 0.0669 & 0.05 \\
-LGP     & 0.852 & 0.0798 & 535.50 \\
+LGP \citep{golding2016fast}     & 0.852 & 0.0798 & 535.50 \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -1347,21 +1349,21 @@ LGP     & 0.852 & 0.0798 & 535.50 \\
 
 Let \(\mathbf{Y}\in\mathbb{R}^{n\times q}\) contain the observed class counts.
 Then
-\[
+$$
 \boldsymbol{\pi}(\vx)\mid\mathcal D_n
 \sim
 \operatorname{Dirichlet}
 \left\{
 \boldsymbol{\alpha}_n(\vx)
 \right\},
-\]
-\[
+$$
+$$
 \boldsymbol{\alpha}_n(\vx)
 =
 \boldsymbol{\alpha}_0(\vx)
 +
 \vk(\vx)^\top\mathbf{Y}.
-\]
+$$
 
 \end{block}
 
