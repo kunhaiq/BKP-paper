@@ -1,33 +1,14 @@
-# -------------------------------------------------------------------------
-# LaTeX auxiliary files
-# -------------------------------------------------------------------------
+# Ignore everything in the paper directory by default
+*
 
-*.aux
-*.bbl
-*.bcf
-*.blg
-*.brf
-*.fdb_latexmk
-*.fls
-*.idx
-*.ilg
-*.ind
-*.lof
-*.log
-*.lot
-*.nav
-*.out
-*.run.xml
-*.snm
-*.synctex.gz
-*.toc
-*.vrb
-*.xdv
+# Keep the ignore rules themselves
+!.gitignore
 
-# LaTeX temporary files
-*.synctex
-*.synctex(busy)
-*.synctex.gz(busy)
-*.tmp
-*.bak
-*~
+# Keep the manuscript source and compiled paper
+!TR_BKP.tex
+!TR_BKP.pdf
+
+# Keep the bibliography and JSS configuration files
+!refs.bib
+!jss.cls
+!jss.bst

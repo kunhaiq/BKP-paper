@@ -3,46 +3,10 @@
 .Rhistory
 .RData
 .Ruserdata
+.RDataTmp
 
 # renv local libraries and temporary files
 renv/library/
 renv/staging/
 renv/local/
 renv/cellar/
-
-# LaTeX auxiliary files
-*.aux
-*.bbl
-*.bcf
-*.blg
-*.brf
-*.fdb_latexmk
-*.fls
-*.idx
-*.ilg
-*.ind
-*.lof
-*.log
-*.lot
-*.nav
-*.out
-*.run.xml
-*.snm
-*.synctex
-*.synctex.gz
-*.toc
-*.vrb
-*.xdv
-
-# LaTeX/editor temporary files
-*.tmp
-*.bak
-*.backup
-*.sav
-*.tex.bak
-*~
-
-# OS files
-.DS_Store
-Thumbs.db
-desktop.ini
